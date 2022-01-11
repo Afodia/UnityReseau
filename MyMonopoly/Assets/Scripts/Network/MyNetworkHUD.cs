@@ -8,44 +8,42 @@ using UnityEngine.SceneManagement;
 
 namespace Mirror
 {
-    [RequireComponent(typeof(NetworkManager))]
+    [RequireComponent(typeof(MyNetworkRoomManager))]
     public class MyNetworkHUD : MonoBehaviour
     {
-        NetworkManager manager;
-        [SerializeField] string mainMenuSceneName = "MainMenu";
-        [SerializeField] TMP_Text infosText;
+        [Scene] [SerializeField] string mainMenuSceneName = "MainMenu";
+        [SerializeField] TMP_Text infosText = null;
 
-        [Header("Join game")]
-        [SerializeField] TMP_InputField ipAddress;
-        [SerializeField] Button connectGameButton;
-        [SerializeField] Button joinGameButton;
-
-        void Awake()
-        {
-            manager = GetComponent<NetworkManager>();
-        }
+        [Header("Main menu join game")]
+        [SerializeField] TMP_InputField ipAddress = null;
+        [SerializeField] Button connectGameButton = null;
+        [SerializeField] Button joinGameButton = null;
 
         public void StartHostingGame()
         {
-            NetworkManager.singleton.StartHost(); // starts both host and client
+            Debug.Log("Start hosting game");
+            NetworkRoomManager.singleton.StartHost();
         }
 
         public void StopHostingGame()
         {
-            NetworkManager.singleton.StopHost(); // stop both host and client
+            Debug.Log("Stop hosting game");
+            NetworkRoomManager.singleton.StopHost();
             ReloadMainMenuScene();
         }
 
         public void ConnectGame()
         {
+            Debug.Log("Connecting to game...");
             NetworkManager.singleton.networkAddress = ipAddress.text;
             connectGameButton.interactable = false;
             infosText.text = $"Connecting to {NetworkManager.singleton.networkAddress}...";
-            NetworkManager.singleton.StartClient();
+            NetworkRoomManager.singleton.StartClient();
         }
 
-        public void JoinGame()
+        public void ReadyToJoinGame()
         {
+            Debug.Log("Joining game");
             NetworkClient.Ready();
             if (NetworkClient.localPlayer == null)
                 NetworkClient.AddPlayer();
@@ -53,14 +51,15 @@ namespace Mirror
 
         public void LeaveGame()
         {
-            NetworkManager.singleton.StopClient();
+            Debug.Log("Leaving game");
+            NetworkRoomManager.singleton.StopClient();
             ReloadMainMenuScene();
         }
 
         void ReloadMainMenuScene()
         {
-            if (manager)
-                Destroy(manager.transform.gameObject);
+            Debug.Log("Reloading main menu scene");
+            Destroy(this.gameObject);
             SceneManager.LoadScene(mainMenuSceneName);
         }
 
@@ -68,7 +67,7 @@ namespace Mirror
         {
             UpdateStatusLabels();
 
-            if (NetworkClient.isConnected && !NetworkClient.ready && !joinGameButton.IsActive())
+            if (NetworkClient.isConnected && !NetworkClient.ready && joinGameButton && !joinGameButton.IsActive())
                 joinGameButton.enabled = true;
         }
 
