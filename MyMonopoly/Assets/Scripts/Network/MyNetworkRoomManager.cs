@@ -169,11 +169,12 @@ public class MyNetworkRoomManager : NetworkRoomManager
 
     #endregion
 
-    #region Optional UI
+    #region optional UI
 
     public override void OnGUI()
     {
-        base.OnGUI();
+        if (showRoomGUI && IsSceneActive(RoomScene))
+            GUI.Box(new Rect(50f, Screen.height / 2 - 50f, Screen.width - 100f, 200f), "PLAYERS");
     }
 
     #endregion

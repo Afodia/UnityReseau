@@ -151,7 +151,7 @@ namespace Mirror
         {
             GUILayout.BeginArea(new Rect(20f + (index * 100), 200f, 90f, 130f));
 
-            GUILayout.Label($"Player {index + 1}");
+            GUILayout.Label($"Player [{index + 1}]");
 
             if (readyToBegin)
                 GUILayout.Label("Ready");
