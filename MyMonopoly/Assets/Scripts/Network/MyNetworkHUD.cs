@@ -21,20 +21,17 @@ namespace Mirror
 
         public void StartHostingGame()
         {
-            Debug.Log("Start hosting game");
             NetworkRoomManager.singleton.StartHost();
         }
 
         public void StopHostingGame()
         {
-            Debug.Log("Stop hosting game");
             NetworkRoomManager.singleton.StopHost();
             ReloadMainMenuScene();
         }
 
         public void ConnectGame()
         {
-            Debug.Log("Connecting to game...");
             NetworkManager.singleton.networkAddress = ipAddress.text;
             connectGameButton.interactable = false;
             infosText.text = $"Connecting to {NetworkManager.singleton.networkAddress}...";
@@ -43,7 +40,6 @@ namespace Mirror
 
         public void ReadyToJoinGame()
         {
-            Debug.Log("Joining game");
             NetworkClient.Ready();
             if (NetworkClient.localPlayer == null)
                 NetworkClient.AddPlayer();
@@ -51,14 +47,12 @@ namespace Mirror
 
         public void LeaveGame()
         {
-            Debug.Log("Leaving game");
             NetworkRoomManager.singleton.StopClient();
             ReloadMainMenuScene();
         }
 
         void ReloadMainMenuScene()
         {
-            Debug.Log("Reloading main menu scene");
             Destroy(this.gameObject);
             SceneManager.LoadScene(mainMenuSceneName);
         }
