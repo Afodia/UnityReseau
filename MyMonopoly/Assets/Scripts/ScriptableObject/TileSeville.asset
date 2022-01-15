@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
+  m_Name: TileSeville
+  m_EditorClassIdentifier: 
+  tileName: Seville
+  upgradePrice: 60ea000050c3000050c3000050c3000000000000
+  sellPrice: 60ea0000b0ad0100007102005034030000000000
+  rentPrice: d0070000606d0000d8d600003844010088840200
+  buyPrice: c0d40100605b030000e20400a068060000000000

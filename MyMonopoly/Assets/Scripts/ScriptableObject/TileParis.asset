@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
+  m_Name: TileParis
+  m_EditorClassIdentifier: 
+  tileName: Paris
+  upgradePrice: 00e20400400d0300400d0300400d030000000000
+  sellPrice: 00e2040040ef070080fc0a00c0090e0000000000
+  rentPrice: 606d000020bf0200407e0500603d0800301b0f00
+  buyPrice: 00c4090080de0f0000f9150080131c0000000000

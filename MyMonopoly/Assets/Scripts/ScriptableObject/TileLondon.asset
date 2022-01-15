@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
+  m_Name: TileLondon
+  m_EditorClassIdentifier: 
+  tileName: London
+  upgradePrice: 605b0300f0490200f0490200f049020000000000
+  sellPrice: 605b030050a5050040ef070030390a0000000000
+  rentPrice: 5046000068b90100e86e030050280500f8710900
+  buyPrice: c0b60600a04a0b0080de0f006072140000000000

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
+  m_Name: TileShanghai
+  m_EditorClassIdentifier: 
+  tileName: Shanghai
+  upgradePrice: c0d4010050c3000050c3000050c30000f0490200
+  sellPrice: c0d4010010980200605b0300b01e0400a0680600
+  rentPrice: 401f000070940000f824010068b90100e86e0300
+  buyPrice: 80a9030020300500c0b60600603d080000000000

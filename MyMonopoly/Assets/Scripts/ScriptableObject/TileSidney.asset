@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
+  m_Name: TileSidney
+  m_EditorClassIdentifier: 
+  tileName: Sidney
+  upgradePrice: 80a90300f0490200f0490200f049020000000000
+  sellPrice: 80a9030070f30500603d080050870a0000000000
+  rentPrice: 204e0000c0d4010080a90300407e050020120a00
+  buyPrice: 00530700e0e60b00c07a1000a00e150000000000
