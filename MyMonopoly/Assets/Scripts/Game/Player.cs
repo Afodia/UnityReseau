@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
 {
     int id;
     bool isFirstBoardTurn = true;
-    uint money = 2000000;
+    float money = 2000000f;
     int nbMonopole = 0;
     int currTile = 0;
     int nbJailTurn = 0;
@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     }
 
     [Server]
-    public uint GetMoney()
+    public float GetMoney()
     {
         return money;
     }
@@ -48,14 +48,14 @@ public class Player : MonoBehaviour
     #endregion
 
     #region Client
-    public void OfferToUpgrade(int[] upgradePrice)
+    public void OfferToUpgrade(float[] upgradePrice)
     {
         //if (!hasAuthority)
         DisplayUpgradeOffer(upgradePrice);
     }
 
     [Client]
-    private void DisplayUpgradeOffer(int[] price)
+    private void DisplayUpgradeOffer(float[] price)
     {
 
     }

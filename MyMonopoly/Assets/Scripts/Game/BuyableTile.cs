@@ -40,14 +40,14 @@ public class BuyableTile : Tile
     [Server]
     private bool PayRent(Player player)
     {
-        uint rent = GetRent();
+        float rent = GetRent();
         return true;
     }
 
     [Server]
-    private uint GetRent()
+    private float GetRent()
     {
-        return data.rentPrice[currLvl] * (System.Convert.ToInt32(isMonopole) + 1);
+        return data.rentPrice[currLvl] * (System.Convert.ToSingle(isMonopole) + 1f);
     }
 
     #endregion

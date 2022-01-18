@@ -21,7 +21,7 @@ public abstract class Tile : MonoBehaviour
     };
 
     #region Server
-    [Server]
+    // [Server]
     public abstract void Action(Player player);
     #endregion
 
