@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 491777258466362801}
   m_Layer: 0
-  m_Name: RoomPlayerCard
+  m_Name: Old_RoomPlayerCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
