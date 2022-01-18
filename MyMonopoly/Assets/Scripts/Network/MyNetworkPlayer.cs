@@ -1,5 +1,6 @@
 using System;
 using Mirror;
+using UnityEngine;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
@@ -58,17 +59,16 @@ public class MyNetworkPlayer : NetworkBehaviour
     #endregion
 
     #region Client
-    public void OfferToUpgrade(float[] upgradePrice)
+    public void OfferToUpgrade(TilesData upgradePrice, Sprite[] houses, int lvl)
     {
         //if (!hasAuthority)
-        DisplayUpgradeOffer(upgradePrice);
+        DisplayUpgradeOffer(upgradePrice, houses, lvl);
     }
 
-    [Client]
-    private void DisplayUpgradeOffer(float[] price)
+    //[Client]
+    private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
     {
-
+        UIPanel.instance.ShowPanel(price, houses, lvl);
     }
-
     #endregion
 }
