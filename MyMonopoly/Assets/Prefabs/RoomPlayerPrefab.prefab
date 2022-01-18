@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6466494710915676958}
   - component: {fileID: -3565350568526003090}
   m_Layer: 0
-  m_Name: TmpRoomPlayerPrefab
+  m_Name: RoomPlayerPrefab
   m_TagString: RoomPlayer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,3 +67,4 @@ MonoBehaviour:
   showRoomGUI: 1
   readyToBegin: 0
   index: 0
+  prefabPlayerUI: {fileID: 0}

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using TMPro;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-manager
@@ -20,6 +21,7 @@ using Mirror;
 /// </summary>
 public class MyNetworkRoomManager : NetworkRoomManager
 {
+
     #region Server Callbacks
 
     /// <summary>
@@ -144,7 +146,10 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the client when disconnected from a server.
     /// </summary>
-    public override void OnRoomClientDisconnect() { }
+    public override void OnRoomClientDisconnect()
+    {
+        ShowErrorMenu("You have been disconnected from the server.", Color.black);
+    }
 
     /// <summary>
     /// This is called on the client when a client is started.
@@ -165,11 +170,26 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// Called on the client when adding a player to the room fails.
     /// <para>This could be because the room is full, or the connection is not allowed to have more players.</para>
     /// </summary>
-    public override void OnRoomClientAddPlayerFailed() { }
+    public override void OnRoomClientAddPlayerFailed()
+    {
+        ShowErrorMenu("Failed to add player to the room.", Color.black);
+    }
 
     #endregion
 
-    #region optional UI
+    #region Optional UI
+
+    [Header("ErrorMenu")]
+    [SerializeField] GameObject errorMenu = null;
+
+    public void ShowErrorMenu(string errorMessage = "An error occured.", Color textColor = default)
+    {
+        TMP_Text errorText = errorMenu.GetComponentInChildren<TMP_Text>();
+        errorText.text = errorMessage;
+        errorText.color = textColor;
+
+        errorMenu.SetActive(true);
+    }
 
     public override void OnGUI()
     {
