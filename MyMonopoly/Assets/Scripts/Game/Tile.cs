@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Mirror;
 
 public abstract class Tile : MonoBehaviour
 {
+    [SerializeField] SpriteRenderer over;
+    [Header("To change")]
     [SerializeField] protected int _id;
     [SerializeField] protected Type type;
     [SerializeField] private Sprite overlay = null;
+
     public enum Type
     {
         Start,
@@ -21,7 +23,6 @@ public abstract class Tile : MonoBehaviour
     };
 
     #region Server
-    // [Server]
     public abstract void Action(Player player);
     #endregion
 
@@ -29,8 +30,8 @@ public abstract class Tile : MonoBehaviour
     [Client]
     private void Start()
     {
-        if (overlay && TryGetComponent(out Image img))
-            img.sprite = overlay;
+        if (overlay && over)
+            over.sprite = overlay;
     }
 
     #endregion

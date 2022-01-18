@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileGranada
   m_EditorClassIdentifier: 
   tileName: Granada
-  upgradePrice: 60ea000050c3000050c3000050c3000000000000
-  sellPrice: 60ea0000b0ad0100007102005034030000000000
-  rentPrice: d0070000a861000050c30000f8240100f0490200
-  buyPrice: c0d40100605b030000e20400a068060000000000
+  upgradePrice:
+  - 60000
+  - 50000
+  - 50000
+  - 50000
+  - 0
+  sellPrice:
+  - 60000
+  - 110000
+  - 160000
+  - 210000
+  - 0
+  rentPrice:
+  - 2000
+  - 25000
+  - 50000
+  - 75000
+  - 150000
+  buyPrice:
+  - 120000
+  - 220000
+  - 320000
+  - 420000
+  - 0

@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileMadrid
   m_EditorClassIdentifier: 
   tileName: Madrid
-  upgradePrice: 60ea000050c3000050c3000050c3000000000000
-  sellPrice: 60ea0000b0ad0100007102005034030000000000
-  rentPrice: a00f00003075000060ea0000905f010020bf0200
-  buyPrice: c0d40100605b030000e20400a068060000000000
+  upgradePrice:
+  - 60000
+  - 50000
+  - 50000
+  - 50000
+  - 100000
+  sellPrice:
+  - 60000
+  - 110000
+  - 160000
+  - 210000
+  - 310000
+  rentPrice:
+  - 4000
+  - 30000
+  - 60000
+  - 90000
+  - 180000
+  buyPrice:
+  - 120000
+  - 220000
+  - 320000
+  - 420000
+  - 0

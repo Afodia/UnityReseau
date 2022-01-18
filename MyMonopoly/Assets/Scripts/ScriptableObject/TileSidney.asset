@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileSidney
   m_EditorClassIdentifier: 
   tileName: Sidney
-  upgradePrice: 80a90300f0490200f0490200f049020000000000
-  sellPrice: 80a9030070f30500603d080050870a0000000000
-  rentPrice: 204e0000c0d4010080a90300407e050020120a00
-  buyPrice: 00530700e0e60b00c07a1000a00e150000000000
+  upgradePrice:
+  - 240000
+  - 150000
+  - 150000
+  - 150000
+  - 0
+  sellPrice:
+  - 240000
+  - 390000
+  - 540000
+  - 690000
+  - 0
+  rentPrice:
+  - 20000
+  - 120000
+  - 240000
+  - 360000
+  - 660000
+  buyPrice:
+  - 480000
+  - 780000
+  - 1080000
+  - 1380000
+  - 0

@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileLondon
   m_EditorClassIdentifier: 
   tileName: London
-  upgradePrice: 605b0300f0490200f0490200f049020000000000
-  sellPrice: 605b030050a5050040ef070030390a0000000000
-  rentPrice: 5046000068b90100e86e030050280500f8710900
-  buyPrice: c0b60600a04a0b0080de0f006072140000000000
+  upgradePrice:
+  - 220000
+  - 150000
+  - 150000
+  - 150000
+  - 0
+  sellPrice:
+  - 220000
+  - 370000
+  - 520000
+  - 670000
+  - 0
+  rentPrice:
+  - 18000
+  - 113000
+  - 225000
+  - 338000
+  - 619000
+  buyPrice:
+  - 440000
+  - 740000
+  - 1040000
+  - 1340000
+  - 0

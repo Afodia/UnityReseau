@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileVenice
   m_EditorClassIdentifier: 
   tileName: Venice
-  upgradePrice: e0220200a0860100a0860100a086010000000000
-  sellPrice: e022020080a9030020300500c0b6060000000000
-  rentPrice: 1027000070110100e022020050340300e8df0500
-  buyPrice: c04504000053070040600a00806d0d0000000000
+  upgradePrice:
+  - 140000
+  - 100000
+  - 100000
+  - 100000
+  - 0
+  sellPrice:
+  - 140000
+  - 240000
+  - 340000
+  - 440000
+  - 0
+  rentPrice:
+  - 10000
+  - 70000
+  - 140000
+  - 210000
+  - 385000
+  buyPrice:
+  - 280000
+  - 480000
+  - 680000
+  - 880000
+  - 0

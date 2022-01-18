@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileParis
   m_EditorClassIdentifier: 
   tileName: Paris
-  upgradePrice: 00e20400400d0300400d0300400d030000000000
-  sellPrice: 00e2040040ef070080fc0a00c0090e0000000000
-  rentPrice: 606d000020bf0200407e0500603d0800301b0f00
-  buyPrice: 00c4090080de0f0000f9150080131c0000000000
+  upgradePrice:
+  - 320000
+  - 200000
+  - 200000
+  - 200000
+  - 0
+  sellPrice:
+  - 320000
+  - 520000
+  - 720000
+  - 920000
+  - 0
+  rentPrice:
+  - 28000
+  - 180000
+  - 360000
+  - 540000
+  - 990000
+  buyPrice:
+  - 640000
+  - 1040000
+  - 1440000
+  - 1840000
+  - 0

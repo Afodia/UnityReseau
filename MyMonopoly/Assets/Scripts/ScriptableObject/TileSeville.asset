@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileSeville
   m_EditorClassIdentifier: 
   tileName: Seville
-  upgradePrice: 60ea000050c3000050c3000050c3000000000000
-  sellPrice: 60ea0000b0ad0100007102005034030000000000
-  rentPrice: d0070000606d0000d8d600003844010088840200
-  buyPrice: c0d40100605b030000e20400a068060000000000
+  upgradePrice:
+  - 60000
+  - 50000
+  - 50000
+  - 50000
+  - 100000
+  sellPrice:
+  - 60000
+  - 110000
+  - 160000
+  - 210000
+  - 310000
+  rentPrice:
+  - 2000
+  - 28000
+  - 55000
+  - 83000
+  - 165000
+  buyPrice:
+  - 120000
+  - 220000
+  - 320000
+  - 420000
+  - 0

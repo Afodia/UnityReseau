@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileBerlin
   m_EditorClassIdentifier: 
   tileName: Berlin
-  upgradePrice: 400d0300a0860100a0860100a086010000000000
-  sellPrice: 400d0300e0930400801a060020a1070000000000
-  rentPrice: 803e0000905f010020bf0200b01e0400988d0700
-  buyPrice: 801a0600c027090000350c0040420f0000000000
+  upgradePrice:
+  - 200000
+  - 100000
+  - 100000
+  - 100000
+  - 0
+  sellPrice:
+  - 200000
+  - 300000
+  - 400000
+  - 500000
+  - 0
+  rentPrice:
+  - 16000
+  - 90000
+  - 180000
+  - 270000
+  - 495000
+  buyPrice:
+  - 400000
+  - 500000
+  - 800000
+  - 1000000
+  - 0

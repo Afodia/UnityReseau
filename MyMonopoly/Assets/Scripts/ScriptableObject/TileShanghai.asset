@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileShanghai
   m_EditorClassIdentifier: 
   tileName: Shanghai
-  upgradePrice: c0d4010050c3000050c3000050c30000f0490200
-  sellPrice: c0d4010010980200605b0300b01e0400a0680600
-  rentPrice: 401f000070940000f824010068b90100e86e0300
-  buyPrice: 80a9030020300500c0b60600603d080000000000
+  upgradePrice:
+  - 120000
+  - 50000
+  - 50000
+  - 50000
+  - 150000
+  sellPrice:
+  - 120000
+  - 170000
+  - 220000
+  - 270000
+  - 420000
+  rentPrice:
+  - 8000
+  - 38000
+  - 75000
+  - 113000
+  - 225000
+  buyPrice:
+  - 240000
+  - 340000
+  - 440000
+  - 540000
+  - 0

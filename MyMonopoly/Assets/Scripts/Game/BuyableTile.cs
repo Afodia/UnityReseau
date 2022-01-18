@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using TMPro;
 
 public class BuyableTile : Tile
 {
     [SerializeField] TilesData data;
-    [SerializeField] Image[] houses;
+    [Header("Do not touch")]
+    [SerializeField] TextMeshPro cityName;
+    [SerializeField] TextMeshPro price;
+    [SerializeField] SpriteRenderer house;
+    [SerializeField] GameObject playerPos;
+    [SerializeField] Sprite[] houses = new Sprite[16];
 
     private bool isMonopole = false;
     private int ownerId = 0;
     private int currLvl = 0;
 
     #region Server
-    [Server]
+    //[Server]
     public override void Action(Player player)
     {
         if (ownerId == 0)
@@ -24,24 +30,26 @@ public class BuyableTile : Tile
     }
 
     [Server]
-    private bool BuyTile(Player player)
+    private void BuyTile(Player player)
     {
         if (ownerId != 0)
-            return false;
-        return true;
+            return;
     }
-    [Server]
-    private bool UpgradeTile(Player player)
+    //[Server]
+    private void UpgradeTile(Player player)
     {
         if (player.GetMoney() >= data.upgradePrice[0])
-            player.OfferToUpgrade(data.upgradePrice);
-        return true;
+            player.OfferToUpgrade(data, new Sprite[4] { 
+                houses[player.GetId()],
+                houses[player.GetId() + 4 ],
+                houses[player.GetId() + 8 ],
+                houses[player.GetId() + 12]
+            }, currLvl);
     }
     [Server]
-    private bool PayRent(Player player)
+    private void PayRent(Player player)
     {
         float rent = GetRent();
-        return true;
     }
 
     [Server]
@@ -56,8 +64,7 @@ public class BuyableTile : Tile
 
     private void Start()
     {
-        if (TryGetComponent<Text>(out Text name))
-            name.text = data.tileName;
+        cityName.text = data.tileName;
     }
     #endregion
 }

@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileNY
   m_EditorClassIdentifier: 
   tileName: New York
-  upgradePrice: c0450400f0490200f0490200f049020000000000
-  sellPrice: c0450400b08f0600a0d9080090230b0000000000
-  rentPrice: c05d0000982e020048590400e087060080f60b00
-  buyPrice: 808b0800601f0d0040b311002047160000000000
+  upgradePrice:
+  - 280000
+  - 150000
+  - 150000
+  - 150000
+  - 0
+  sellPrice:
+  - 280000
+  - 430000
+  - 580000
+  - 730000
+  - 0
+  rentPrice:
+  - 24000
+  - 143000
+  - 285000
+  - 428000
+  - 784000
+  buyPrice:
+  - 560000
+  - 860000
+  - 1160000
+  - 1460000
+  - 0

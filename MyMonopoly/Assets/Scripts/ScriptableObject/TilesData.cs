@@ -6,8 +6,8 @@ using UnityEngine;
 public class TilesData : ScriptableObject
 {
     public string tileName;
-    public float[] upgradePrice;
-    public float[] sellPrice;
-    public float[] rentPrice;
-    public float[] buyPrice;
+    public float[] upgradePrice = new float[5];
+    public float[] sellPrice = new float[5];
+    public float[] rentPrice = new float[5];
+    public float[] buyPrice = new float[5];
 }

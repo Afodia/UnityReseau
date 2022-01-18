@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileRome
   m_EditorClassIdentifier: 
   tileName: Rome
-  upgradePrice: 00710200a0860100a0860100a086010000000000
-  sellPrice: 00710200a0f70300407e0500e004070000000000
-  rentPrice: e02e0000803801000071020080a90300c0b60600
-  buyPrice: 00e2040040ef070080fc0a00c0090e0000000000
+  upgradePrice:
+  - 160000
+  - 100000
+  - 100000
+  - 100000
+  - 0
+  sellPrice:
+  - 160000
+  - 260000
+  - 360000
+  - 460000
+  - 0
+  rentPrice:
+  - 12000
+  - 80000
+  - 160000
+  - 240000
+  - 440000
+  buyPrice:
+  - 320000
+  - 520000
+  - 720000
+  - 920000
+  - 0

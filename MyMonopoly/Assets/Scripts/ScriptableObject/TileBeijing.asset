@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileBeijing
   m_EditorClassIdentifier: 
   tileName: Beijing
-  upgradePrice: a086010050c3000050c3000050c30000f0490200
-  sellPrice: a0860100f0490200400d030090d00300801a0600
-  rentPrice: 70170000b8880000f8240100289a010050340300
-  buyPrice: 400d0300e0930400801a060020a1070000000000
+  upgradePrice:
+  - 100000
+  - 50000
+  - 50000
+  - 50000
+  - 150000
+  sellPrice:
+  - 100000
+  - 150000
+  - 200000
+  - 250000
+  - 400000
+  rentPrice:
+  - 6000
+  - 35000
+  - 75000
+  - 105000
+  - 210000
+  buyPrice:
+  - 200000
+  - 300000
+  - 400000
+  - 500000
+  - 0

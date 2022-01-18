@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileOsaka
   m_EditorClassIdentifier: 
   tileName: Osaka
-  upgradePrice: 30570500400d0300400d0300400d030000000000
-  sellPrice: 3057050070640800b0710b00f07e0e0000000000
-  rentPrice: b888000030e6020060cc050090b2080008f20f00
-  buyPrice: 60ae0a00e0c8100060e31600e0fd1c0000000000
+  upgradePrice:
+  - 350000
+  - 200000
+  - 200000
+  - 200000
+  - 0
+  sellPrice:
+  - 350000
+  - 550000
+  - 750000
+  - 950000
+  - 0
+  rentPrice:
+  - 35000
+  - 190000
+  - 380000
+  - 570000
+  - 1045000
+  buyPrice:
+  - 700000
+  - 1100000
+  - 1500000
+  - 1900000
+  - 0

@@ -13,7 +13,27 @@ MonoBehaviour:
   m_Name: TileChicago
   m_EditorClassIdentifier: 
   tileName: Chicago
-  upgradePrice: a0f70300f0490200f0490200f0490200d8b80500
-  sellPrice: a0f7030090410600808b080070d50a00488e1000
-  rentPrice: f055000000f4010018e4030018d8050048b20a00
-  buyPrice: 40ef070020830c0000171100e0aa150000000000
+  upgradePrice:
+  - 260000
+  - 150000
+  - 150000
+  - 150000
+  - 375000
+  sellPrice:
+  - 260000
+  - 410000
+  - 560000
+  - 710000
+  - 1085000
+  rentPrice:
+  - 22000
+  - 128000
+  - 255000
+  - 383000
+  - 701000
+  buyPrice:
+  - 520000
+  - 820000
+  - 1120000
+  - 1420000
+  - 0
