@@ -1,24 +1,46 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GameObject PauseMenu;
+    [Header("Game Settings")]
+    GameObject myNetworkRoomManager = null;
     [SerializeField] GameObject[] playersUI = new GameObject[4];
     List<MyNetworkPlayer> networkPlayers = new List<MyNetworkPlayer>();
+    public static event Action<int> OnPlayerTurnEnds;
+    [SerializeField] GameObject dicesContainer = null;
+    [SerializeField] RollTheDice diceRoller1 = null;
+    [SerializeField] RollTheDice diceRoller2 = null;
+
+
+    [Header("Menus")]
+    [SerializeField] GameObject PauseMenu;
+    [SerializeField] GameObject WinLoseMenu;
+    [SerializeField] TMP_Text WinLoseText;
+
 
     void Start()
     {
+        myNetworkRoomManager = GameObject.Find("MyNetworkRoomManager");
+        MyNetworkRoomManager.OnPlayerWin += PlayerWin;
+        MyNetworkRoomManager.OnPlayerLose += PlayerLose;
+        MyNetworkRoomManager.OnPlayerNewTurnStarts += PlayerNewTurnStarts;
+
         OnPlayerAdd();
         MyNetworkPlayer.OnPlayerAdded += OnPlayerAdd;
-
     }
 
-    void OnServerDisconnected()
+    void OnDestroy()
     {
-        Debug.Log("Server disconnected");
-        PauseMenu.SetActive(true);
+        MyNetworkRoomManager.OnPlayerWin += PlayerWin;
+        MyNetworkRoomManager.OnPlayerLose += PlayerLose;
+
+        MyNetworkRoomManager.OnPlayerNewTurnStarts -= PlayerNewTurnStarts;
+        MyNetworkPlayer.OnMoneyChanged -= UpdateDisplayMoneyOfPlayer;
+        MyNetworkPlayer.OnPlayerAdded -= OnPlayerAdd;
     }
 
     void OnPlayerAdd()
@@ -47,18 +69,41 @@ public class GameManager : MonoBehaviour
         return players;
     }
 
-    void OnDestroy()
-    {
-        MyNetworkPlayer.OnMoneyChanged -= UpdateDisplayMoneyOfPlayer;
-        MyNetworkPlayer.OnPlayerAdded -= OnPlayerAdd;
-    }
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             PauseMenu.SetActive(!PauseMenu.activeSelf);
-        }
+    }
+
+    #region Game loop
+    void PlayerNewTurnStarts(int id)
+    {
+        if (myNetworkRoomManager.GetComponent<MyNetworkRoomManager>().clientIndex != id)
+            return;
+
+        dicesContainer.SetActive(true);
+    }
+
+    void EndTurn()
+    {
+        OnPlayerTurnEnds?.Invoke(myNetworkRoomManager.GetComponent<MyNetworkRoomManager>().clientIndex);
+    }
+
+    public void RollDices()
+    {
+        StartCoroutine(IERollDices());
+    }
+
+    public IEnumerator IERollDices()
+    {
+        yield return diceRoller1.Roll();
+        yield return diceRoller2.Roll();
+        yield return new WaitForSeconds(2.5f);
+        int resDice1 = diceRoller1.GetLastRollResult();
+        int resDice2 = diceRoller2.GetLastRollResult();
+        Debug.Log($"Dice 1 : {resDice1}, Dice 2 : {resDice2}");
+        dicesContainer.SetActive(false);
+        EndTurn();
     }
 
     void UpdateDisplayMoneyOfPlayer(int id, float money)
@@ -80,4 +125,25 @@ public class GameManager : MonoBehaviour
         }
         return result;
     }
+    #endregion
+
+    #region Player Win/Lose
+    void PlayerWin(int playerId, string reason)
+    {
+        if (playerId != myNetworkRoomManager.GetComponent<MyNetworkRoomManager>().clientIndex)
+            return;
+
+        WinLoseMenu.SetActive(true);
+        WinLoseText.text = $"You won because {reason}";
+    }
+
+    void PlayerLose(int playerId, string reason)
+    {
+        if (playerId != myNetworkRoomManager.GetComponent<MyNetworkRoomManager>().clientIndex)
+            return;
+
+        WinLoseMenu.SetActive(true);
+        WinLoseText.text = $"You lose because {reason}";
+    }
+    #endregion
 }

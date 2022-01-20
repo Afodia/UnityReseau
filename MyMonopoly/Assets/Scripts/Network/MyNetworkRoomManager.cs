@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -42,7 +43,10 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the host when the host is stopped.
     /// </summary>
-    public override void OnRoomStopHost() { }
+    public override void OnRoomStopHost()
+    {
+        GameManager.OnPlayerTurnEnds -= NextTurn;
+    }
 
     /// <summary>
     /// This is called on the server when a new client connects to the server.
@@ -106,7 +110,14 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <returns>False to not allow this player to replace the room player.</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
-        return base.OnRoomServerSceneLoadedForPlayer(conn, roomPlayer, gamePlayer);
+        GameManager.OnPlayerTurnEnds += NextTurn;
+        players.Add(gamePlayer.GetComponent<MyNetworkPlayer>());
+        nbInGamePlayersReady++;
+
+        if (CheckIfAllInGamePlayersReady())
+            OnPlayerNewTurnStarts?.Invoke(actualPlayerTurn);
+
+        return true;
     }
 
     /// <summary>
@@ -172,12 +183,13 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientAddPlayerFailed()
     {
+        GameManager.OnPlayerTurnEnds -= NextTurn;
         ShowErrorMenu("Failed to add player to the room.", Color.black);
     }
 
     #endregion
 
-    #region Optional UI
+    #region UI
 
     [Header("ErrorMenu")]
     [SerializeField] GameObject errorMenu = null;
@@ -195,6 +207,43 @@ public class MyNetworkRoomManager : NetworkRoomManager
     {
         if (showRoomGUI && IsSceneActive(RoomScene))
             GUI.Box(new Rect(50f, Screen.height / 2 - 50f, Screen.width - 100f, 200f), "PLAYERS");
+    }
+
+    #endregion
+
+
+    #region Game Management
+
+    [Header("GameManagment")]
+    [SerializeField] GameObject gameManager = null;
+    int nbInGamePlayersReady = 0;
+    public static event Action<int> OnPlayerNewTurnStarts;
+    public static event Action<int, string> OnPlayerWin; // id, reason
+    public static event Action<int, string> OnPlayerLose; // id, reason
+    int actualPlayerTurn = 1;
+    List<MyNetworkPlayer> players = new List<MyNetworkPlayer>();
+
+    bool CheckIfAllInGamePlayersReady()
+    {
+        return nbInGamePlayersReady == NetworkServer.connections.Count;
+    }
+
+    void NextTurn(int playerId)
+    {
+        if (playerId != actualPlayerTurn)
+            return;
+
+        // vérifier les conditions de victoire et défaite
+        if (NetworkServer.connections.Count == 1)
+        {
+            OnPlayerWin?.Invoke(playerId, "you are the last survivor !");
+            return;
+        }
+
+        actualPlayerTurn++;
+        if (actualPlayerTurn > NetworkServer.connections.Count)
+            actualPlayerTurn = 1;
+        OnPlayerNewTurnStarts?.Invoke(actualPlayerTurn);
     }
 
     #endregion
