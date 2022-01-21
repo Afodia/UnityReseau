@@ -10,10 +10,12 @@ public class Player : MonoBehaviour
     public float money = 2000000f;
     int nbMonopole = 0;
     int currTile = 0;
-    int nbJailTurn = 0;
+    int nbJailTurn {get; set;} = 0;
     int nbConsecutiveDouble = 0;
 
     #region Server
+    //[Server]
+
     //[Server]
     public int GetId()
     {
@@ -59,7 +61,7 @@ public class Player : MonoBehaviour
     //[Client]
     private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
     {
-        UIPanel.instance.ShowPanel(price, houses, lvl);
+        UIPanel.instance.ShowPanel(price, houses, lvl, money, id);
     }
 
     #endregion

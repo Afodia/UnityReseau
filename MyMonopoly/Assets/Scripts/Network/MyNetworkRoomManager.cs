@@ -225,7 +225,15 @@ public class MyNetworkRoomManager : NetworkRoomManager
 
     bool CheckIfAllInGamePlayersReady()
     {
-        return nbInGamePlayersReady == NetworkServer.connections.Count;
+        if (nbInGamePlayersReady != NetworkServer.connections.Count)
+            return false;
+        UIPanel.OnPlayerBoughtUpgrade += PlayerBoughtUpgrade;
+        return true;
+    }
+
+    void PlayerBoughtUpgrade(int playerId, int upgradeLvl)
+    {
+        Debug.Log("putchou");
     }
 
     void NextTurn(int playerId)

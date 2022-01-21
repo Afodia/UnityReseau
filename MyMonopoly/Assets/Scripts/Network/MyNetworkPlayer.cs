@@ -68,7 +68,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     //[Client]
     private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
     {
-        UIPanel.instance.ShowPanel(price, houses, lvl);
+        UIPanel.instance.ShowPanel(price, houses, lvl, money, id);
     }
     #endregion
 }

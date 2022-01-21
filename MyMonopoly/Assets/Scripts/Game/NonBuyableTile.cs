@@ -52,4 +52,12 @@ public class NonBuyableTile : Tile
 
     #endregion
 
+
+    #region Client
+    private void Start()
+    {
+        if (overlay && over)
+            over.sprite = overlay;
+    }
+    #endregion
 }

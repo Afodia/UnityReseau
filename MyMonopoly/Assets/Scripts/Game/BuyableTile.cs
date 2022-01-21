@@ -46,6 +46,16 @@ public class BuyableTile : Tile
                 houses[player.GetId() + 12]
             }, currLvl);
     }
+
+    [Server]
+    public void UpdateTile(int pId, int lvl)
+    {
+        currLvl = lvl;
+        ownerId = pId;
+        price.text = UIPanel.instance.ChangePriceToText(data.rentPrice[lvl]);
+        house.sprite = houses[pId + (lvl * 4)];
+    }
+
     [Server]
     private void PayRent(Player player)
     {
@@ -65,6 +75,11 @@ public class BuyableTile : Tile
     private void Start()
     {
         cityName.text = data.tileName;
+        house.sprite = null;
+        price.text = "";
+        if (overlay && over)
+            over.sprite = overlay;
     }
+
     #endregion
 }

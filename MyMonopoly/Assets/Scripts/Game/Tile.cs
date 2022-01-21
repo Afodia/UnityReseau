@@ -5,11 +5,11 @@ using Mirror;
 
 public abstract class Tile : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer over;
+    [SerializeField] protected SpriteRenderer over;
     [Header("To change")]
     [SerializeField] protected int _id;
     [SerializeField] protected Type type;
-    [SerializeField] private Sprite overlay = null;
+    [SerializeField] protected Sprite overlay = null;
 
     public enum Type
     {
@@ -19,7 +19,8 @@ public abstract class Tile : MonoBehaviour
         Luck,
         Train,
         Square,
-        House
+        House,
+        Taxes
     };
 
     #region Server
@@ -27,11 +28,10 @@ public abstract class Tile : MonoBehaviour
     #endregion
 
     #region Client
-    [Client]
     private void Start()
     {
-        if (overlay && over)
-            over.sprite = overlay;
+        Debug.Log(over);
+        Debug.Log(overlay);
     }
 
     #endregion
