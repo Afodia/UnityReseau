@@ -9,7 +9,7 @@ public class RollTheDice : MonoBehaviour
     [SerializeField] Texture[] diceSides = new Texture[6];
     RawImage rend;
 
-    int finalSide = 0;
+    public int finalSide = 0;
 
     void Awake()
     {
@@ -33,5 +33,10 @@ public class RollTheDice : MonoBehaviour
         }
 
         finalSide = randomDiceSide + 1;
+    }
+
+    public int GetLastRollResult()
+    {
+        return finalSide;
     }
 }
