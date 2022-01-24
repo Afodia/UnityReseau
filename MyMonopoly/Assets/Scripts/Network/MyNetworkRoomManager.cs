@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using TMPro;
+using Random = UnityEngine.Random;
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-room-manager
@@ -22,6 +23,18 @@ using TMPro;
 /// </summary>
 public class MyNetworkRoomManager : NetworkRoomManager
 {
+    public static MyNetworkRoomManager instance;
+    private MyNetworkRoomManager() { }
+
+    public override void Awake()
+    {
+        base.Awake();
+
+        if (instance != null && instance != this)
+            Destroy(gameObject);
+
+        instance = this;
+    }
 
     #region Server Callbacks
 
@@ -43,10 +56,7 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <summary>
     /// This is called on the host when the host is stopped.
     /// </summary>
-    public override void OnRoomStopHost()
-    {
-        GameManager.OnPlayerTurnEnds -= NextTurn;
-    }
+    public override void OnRoomStopHost() { }
 
     /// <summary>
     /// This is called on the server when a new client connects to the server.
@@ -110,12 +120,24 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <returns>False to not allow this player to replace the room player.</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
-        GameManager.OnPlayerTurnEnds += NextTurn;
-        players.Add(gamePlayer.GetComponent<MyNetworkPlayer>());
-        nbInGamePlayersReady++;
+        MyNetworkRoomPlayer myRoomPlayer = roomPlayer.GetComponent<MyNetworkRoomPlayer>();
+        MyNetworkPlayer networkPlayer = gamePlayer.GetComponent<MyNetworkPlayer>();
+        networkPlayer.SetId(myRoomPlayer.index);
+        players.Add(networkPlayer);
+        OnPlayerAdded?.Invoke();
 
-        if (CheckIfAllInGamePlayersReady())
-            OnPlayerNewTurnStarts?.Invoke(actualPlayerTurn);
+        if (myRoomPlayer.index == this.clientIndex) {
+            ClientGameManager = GameManager.instance;
+            // GameObject.Find("GameManager").TryGetComponent<GameManager>(out ClientGameManager);
+            Debug.Log("ClientGameManager:" + ClientGameManager.ToString());
+        }
+
+        nbInGamePlayersReady++;
+        if (CheckIfAllInGamePlayersReady()) {
+            Debug.Log("All players ready");
+            OnAllGamePlayersReady?.Invoke();
+            // this.NextTurn();
+        }
 
         return true;
     }
@@ -183,7 +205,6 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientAddPlayerFailed()
     {
-        GameManager.OnPlayerTurnEnds -= NextTurn;
         ShowErrorMenu("Failed to add player to the room.", Color.black);
     }
 
@@ -212,46 +233,91 @@ public class MyNetworkRoomManager : NetworkRoomManager
     #endregion
 
 
-    #region Game Management
+    #region Game Loop Management
 
-    [Header("GameManagment")]
-    [SerializeField] GameObject gameManager = null;
     int nbInGamePlayersReady = 0;
-    public static event Action<int> OnPlayerNewTurnStarts;
-    public static event Action<int, string> OnPlayerWin; // id, reason
-    public static event Action<int, string> OnPlayerLose; // id, reason
-    int actualPlayerTurn = 1;
+    public static event Action OnAllGamePlayersReady;
+    public static event Action OnPlayerAdded;
     List<MyNetworkPlayer> players = new List<MyNetworkPlayer>();
+    bool allInGamePlayerLoaded = false;
 
-    bool CheckIfAllInGamePlayersReady()
+    GameManager ClientGameManager = null;
+    int currentPlayerTurn = 0;
+    MyNetworkPlayer currentPlayer = null;
+
+
+    [Server]
+    void NextTurn()
     {
-        if (nbInGamePlayersReady != NetworkServer.connections.Count)
-            return false;
-        UIPanel.OnPlayerBoughtUpgrade += PlayerBoughtUpgrade;
-        return true;
-    }
-
-    void PlayerBoughtUpgrade(int playerId, int upgradeLvl)
-    {
-        Debug.Log("putchou");
-    }
-
-    void NextTurn(int playerId)
-    {
-        if (playerId != actualPlayerTurn)
-            return;
-
+        Debug.Log($"NextTurn: currentPlayerTurn = {this.currentPlayerTurn}");
         // vérifier les conditions de victoire et défaite
-        if (NetworkServer.connections.Count == 1)
-        {
-            OnPlayerWin?.Invoke(playerId, "you are the last survivor !");
+        if (NetworkServer.connections.Count <= 1) {
+            ClientGameManager.RpcPlayerWin(currentPlayerTurn, "you are the last survivor !");
             return;
         }
 
-        actualPlayerTurn++;
-        if (actualPlayerTurn > NetworkServer.connections.Count)
-            actualPlayerTurn = 1;
-        OnPlayerNewTurnStarts?.Invoke(actualPlayerTurn);
+        this.currentPlayerTurn++;
+        if (this.currentPlayerTurn > NetworkServer.connections.Count)
+            this.currentPlayerTurn = 1;
+
+        currentPlayer = this.getCurrentPlayer();
+        if (currentPlayer != null)
+            throw new Exception("currentPlayer should not be null, could not find player with id " + currentPlayerTurn);
+
+        ClientGameManager.RpcPlayerNewTurnStarts(this.currentPlayerTurn);
+    }
+
+    public void RollDices()
+    {
+        int resDice1 = Random.Range(1, 6);
+        int resDice2 = Random.Range(1, 6);
+
+        ClientGameManager.RpcRollDices(resDice1, resDice2);
+        currentPlayer.ResNewDiceRoll(resDice1, resDice2);
+        if (currentPlayer.GetNbConsecutiveDouble() == 3) {
+            // Go to jail
+            // then connectionToClient.identity.GetComponent<MyNetworkPlayer>().ResetNbConsecutiveDouble();
+        }
+    }
+
+    public void EndTurn()
+    {
+        // check who called this method ?
+        this.NextTurn();
+    }
+
+    bool CheckIfAllInGamePlayersReady()
+    {
+        return (nbInGamePlayersReady == NetworkServer.connections.Count);
+    }
+
+    private void Update()
+    {
+        // Debug.Log("nbInGamePlayersReady: " + nbInGamePlayersReady + " / " + NetworkServer.connections.Count);
+        if (!allInGamePlayerLoaded && CheckIfAllInGamePlayersReady()) {
+            OnAllGamePlayersReady?.Invoke();
+            allInGamePlayerLoaded = true;
+        }
+    }
+
+    #endregion
+    #region Getters & Setters
+
+    [Client]
+    public List<MyNetworkPlayer> GetPlayers()
+    {
+        return players;
+    }
+
+    MyNetworkPlayer getCurrentPlayer()
+    {
+        foreach (MyNetworkPlayer player in players) {
+            if (player.GetId() == this.currentPlayerTurn) {
+                return player;
+            }
+        }
+
+        return null;
     }
 
     #endregion

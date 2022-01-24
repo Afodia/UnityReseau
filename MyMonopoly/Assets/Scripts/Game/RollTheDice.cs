@@ -16,6 +16,7 @@ public class RollTheDice : MonoBehaviour
         rend = GetComponent<RawImage>();
     }
 
+/*
     public int Roll()
     {
         StartCoroutine(IERollTheDice());
@@ -39,4 +40,26 @@ public class RollTheDice : MonoBehaviour
     {
         return finalSide;
     }
+    */
+
+    public int Roll(int finalSide)
+    {
+        this.finalSide = finalSide;
+        StartCoroutine(IERollTheDice());
+        return this.finalSide;
+    }
+
+    IEnumerator IERollTheDice()
+    {
+        int randomDiceSide = 0;
+
+        for (int i = 0; i <= 20; i++) {
+            randomDiceSide = Random.Range(0, 5);
+            rend.texture = diceSides[randomDiceSide];
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        rend.texture = diceSides[finalSide - 1];
+    }
+
 }
