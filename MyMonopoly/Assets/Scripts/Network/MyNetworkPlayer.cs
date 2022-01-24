@@ -1,18 +1,22 @@
 using System;
+using System.Collections;
 using Mirror;
 using UnityEngine;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
     public static event Action<int, float> OnMoneyChanged;
+    [SerializeField] GameObject Dices;
+    [SerializeField] GameObject DicesButton;
 
     int id;
     [SyncVar(hook = nameof(HandleMoneyChange))]float money = 2000000f;
+    NetworkConnection conn;
     bool isFirstBoardTurn = true;
     int nbMonopole = 0;
     int currTile = 0;
     int nbJailTurn = 0;
-    int nbConsecutiveDouble = 0;
+    //int nbConsecutiveDouble = 0;
 
     public override void OnStartServer()
     {
@@ -32,16 +36,54 @@ public class MyNetworkPlayer : NetworkBehaviour
 
 
     #region Client
+
+    [ClientRpc]
+    public void RpcShowDices()
+    {
+        Dices.SetActive(true);
+    }
+
+    [ClientRpc]
+    public void RpcHideDices()
+    {
+        Dices.SetActive(false);
+    }
+
+    public void ShowDiceButton()
+    {
+        DicesButton.SetActive(true);
+    }
+
+    public void HideDiceButton()
+    {
+        DicesButton.SetActive(false);
+    }
+
+    [ClientRpc]
+    public void RpcRollDices(int resDice1, int resDice2)
+    {
+        StartCoroutine(DisplayDicesRolling(resDice1, resDice2));
+    }
+
+    [Client]
+    IEnumerator DisplayDicesRolling(int resDice1, int resDice2)
+    {
+        yield return Dices.GetComponentsInChildren<RollTheDice>()[0].Roll(resDice1);
+        yield return Dices.GetComponentsInChildren<RollTheDice>()[1].Roll(resDice2);
+        yield return new WaitForSeconds(2.5f);
+    }
+
+
     public void OfferToUpgrade(TilesData upgradePrice, Sprite[] houses, int lvl)
     {
         //if (!hasAuthority)
         DisplayUpgradeOffer(upgradePrice, houses, lvl);
     }
 
-    //[Client]
+    [Client]
     private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
     {
-        UIPanel.instance.ShowPanel(price, houses, lvl, money, connectionToClient.connectionId);
+        //UIPanel.instance.ShowPanel(price, houses, lvl, money, connectionToClient.connectionId);
     }
 
     void HandleMoneyChange(float oldTotalMoney, float newTotalMoney)
@@ -68,6 +110,30 @@ public class MyNetworkPlayer : NetworkBehaviour
     }
 
     [Server]
+    public void SetTile(int tile)
+    {
+        this.currTile = tile;
+    }
+
+    [Server]
+    public int GetTile()
+    {
+        return this.currTile;
+    }
+    
+    [Server]
+    public void SetConn(NetworkConnection conn)
+    {
+        this.conn = conn;
+    }
+
+    [Server]
+    public NetworkConnection GetConn()
+    {
+        return this.conn;
+    }
+
+    [Server]
     public float GetMoney()
     {
         return this.money;
@@ -89,26 +155,26 @@ public class MyNetworkPlayer : NetworkBehaviour
         }
     }
 
-    [Server]
-    public int GetNbConsecutiveDouble()
-    {
-        return nbConsecutiveDouble;
-    }
+    //[Server]
+    //public int GetNbConsecutiveDouble()
+    //{
+    //    return nbConsecutiveDouble;
+    //}
 
-    [Server]
-    public void ResNewDiceRoll(int resDice1, int resDice2)
-    {
-        if (resDice1 == resDice2)
-            nbConsecutiveDouble++;
-        else
-            nbConsecutiveDouble = 0;
-    }
+    //[Server]
+    //public void ResNewDiceRoll(int resDice1, int resDice2)
+    //{
+    //    if (resDice1 == resDice2)
+    //        nbConsecutiveDouble++;
+    //    else
+    //        nbConsecutiveDouble = 0;
+    //}
 
-    [Server]
-    public void ResetNbConsecutiveDouble()
-    {
-        nbConsecutiveDouble = 0;
-    }
+    //[Server]
+    //public void ResetNbConsecutiveDouble()
+    //{
+    //    nbConsecutiveDouble = 0;
+    //}
 
     #endregion
 }

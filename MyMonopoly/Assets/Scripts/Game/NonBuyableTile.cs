@@ -7,7 +7,7 @@ public class NonBuyableTile : Tile
 {
     #region Server
     [Server]
-    public override void Action(Player player)
+    public override void Action(MyNetworkPlayer player)
     {
         switch (type) {
             case Type.GoToJail:
@@ -29,23 +29,23 @@ public class NonBuyableTile : Tile
     }
 
     [Server]
-    private void GoToJailAction(Player player)
+    private void GoToJailAction(MyNetworkPlayer player)
     { }
 
     [Server]
-    private void JailAction(Player player)
+    private void JailAction(MyNetworkPlayer player)
     { }
 
     [Server]
-    private void LuckAction(Player player)
+    private void LuckAction(MyNetworkPlayer player)
     { }
 
     [Server]
-    private void SquareAction(Player player)
+    private void SquareAction(MyNetworkPlayer player)
     { }
 
     [Server]
-    private void StartAction(Player player)
+    private void StartAction(MyNetworkPlayer player)
     {
         player.ChangeMoney(300000);
     }

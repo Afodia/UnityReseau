@@ -23,18 +23,18 @@ using Random = UnityEngine.Random;
 /// </summary>
 public class MyNetworkRoomManager : NetworkRoomManager
 {
-    public static MyNetworkRoomManager instance;
-    private MyNetworkRoomManager() { }
+    //public static MyNetworkRoomManager instance;
+    //private MyNetworkRoomManager() { }
 
-    public override void Awake()
-    {
-        base.Awake();
+    //public override void Awake()
+    //{
+    //    base.Awake();
 
-        if (instance != null && instance != this)
-            Destroy(gameObject);
+    //    if (instance != null && instance != this)
+    //        Destroy(gameObject);
 
-        instance = this;
-    }
+    //    instance = this;
+    //}
 
     #region Server Callbacks
 
@@ -120,14 +120,16 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <returns>False to not allow this player to replace the room player.</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
+        Debug.Log("OnRoomServerSceneLoadedForPlayer");
         MyNetworkRoomPlayer myRoomPlayer = roomPlayer.GetComponent<MyNetworkRoomPlayer>();
         MyNetworkPlayer networkPlayer = gamePlayer.GetComponent<MyNetworkPlayer>();
         networkPlayer.SetId(myRoomPlayer.index);
+        networkPlayer.SetConn(conn);
         players.Add(networkPlayer);
         OnPlayerAdded?.Invoke();
 
         if (myRoomPlayer.index == this.clientIndex) {
-            ClientGameManager = GameManager.instance;
+            //ClientGameManager = GameManager.instance;
             // GameObject.Find("GameManager").TryGetComponent<GameManager>(out ClientGameManager);
             Debug.Log("ClientGameManager:" + ClientGameManager.ToString());
         }
@@ -135,7 +137,8 @@ public class MyNetworkRoomManager : NetworkRoomManager
         nbInGamePlayersReady++;
         if (CheckIfAllInGamePlayersReady()) {
             Debug.Log("All players ready");
-            OnAllGamePlayersReady?.Invoke();
+            FindObjectOfType<GameManager>().StartGame(players);
+            //OnAllGamePlayersReady?.Invoke();
             // this.NextTurn();
         }
 
@@ -252,7 +255,7 @@ public class MyNetworkRoomManager : NetworkRoomManager
         Debug.Log($"NextTurn: currentPlayerTurn = {this.currentPlayerTurn}");
         // vérifier les conditions de victoire et défaite
         if (NetworkServer.connections.Count <= 1) {
-            ClientGameManager.RpcPlayerWin(currentPlayerTurn, "you are the last survivor !");
+//            ClientGameManager.RpcPlayerWin(currentPlayerTurn, "you are the last survivor !");
             return;
         }
 
@@ -264,21 +267,21 @@ public class MyNetworkRoomManager : NetworkRoomManager
         if (currentPlayer != null)
             throw new Exception("currentPlayer should not be null, could not find player with id " + currentPlayerTurn);
 
-        ClientGameManager.RpcPlayerNewTurnStarts(this.currentPlayerTurn);
+//        ClientGameManager.RpcPlayerNewTurnStarts(this.currentPlayerTurn);
     }
 
-    public void RollDices()
-    {
-        int resDice1 = Random.Range(1, 6);
-        int resDice2 = Random.Range(1, 6);
+//    public void RollDices()
+//    {
+//        int resDice1 = Random.Range(1, 6);
+//        int resDice2 = Random.Range(1, 6);
 
-        ClientGameManager.RpcRollDices(resDice1, resDice2);
-        currentPlayer.ResNewDiceRoll(resDice1, resDice2);
-        if (currentPlayer.GetNbConsecutiveDouble() == 3) {
-            // Go to jail
-            // then connectionToClient.identity.GetComponent<MyNetworkPlayer>().ResetNbConsecutiveDouble();
-        }
-    }
+////        ClientGameManager.RpcRollDices(resDice1, resDice2);
+//        currentPlayer.ResNewDiceRoll(resDice1, resDice2);
+//        if (currentPlayer.GetNbConsecutiveDouble() == 3) {
+//            // Go to jail
+//            // then connectionToClient.identity.GetComponent<MyNetworkPlayer>().ResetNbConsecutiveDouble();
+//        }
+//    }
 
     public void EndTurn()
     {

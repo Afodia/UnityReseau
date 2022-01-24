@@ -24,14 +24,12 @@ public abstract class Tile : MonoBehaviour
     };
 
     #region Server
-    public abstract void Action(Player player);
+    public abstract void Action(MyNetworkPlayer player);
     #endregion
 
     #region Client
     private void Start()
     {
-        Debug.Log(over);
-        Debug.Log(overlay);
     }
 
     #endregion

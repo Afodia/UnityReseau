@@ -21,7 +21,7 @@ public class BuyableTile : Tile
 
     #region Server
     //[Server]
-    public override void Action(Player player)
+    public override void Action(MyNetworkPlayer player)
     {
         if (ownerId == 0)
             UpgradeTile(player);
@@ -30,13 +30,13 @@ public class BuyableTile : Tile
     }
 
     [Server]
-    private void BuyTile(Player player)
+    private void BuyTile(MyNetworkPlayer player)
     {
         if (ownerId != 0)
             return;
     }
     //[Server]
-    private void UpgradeTile(Player player)
+    private void UpgradeTile(MyNetworkPlayer player)
     {
         if (player.GetMoney() >= data.upgradePrice[0])
             player.OfferToUpgrade(data, new Sprite[4] { 
@@ -57,7 +57,7 @@ public class BuyableTile : Tile
     }
 
     [Server]
-    private void PayRent(Player player)
+    private void PayRent(MyNetworkPlayer player)
     {
         float rent = GetRent();
     }

@@ -16,19 +16,19 @@ public class Player : MonoBehaviour
     #region Server
     //[Server]
 
-    //[Server]
+    [Server]
     public int GetId()
     {
         return id;
     }
 
-    //[Server]
+    [Server]
     public float GetMoney()
     {
         return money;
     }
 
-    //[Server]:
+    [Server]
     public void ChangeMoney(int amount)
     {
         if (amount > 0)
@@ -58,10 +58,10 @@ public class Player : MonoBehaviour
         DisplayUpgradeOffer(upgradePrice, houses, lvl);
     }
 
-    //[Client]
+    [Client]
     private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
     {
-        UIPanel.instance.ShowPanel(price, houses, lvl, money, id);
+        UIPanel.instance.ShowPanel(price, houses, lvl, money);
     }
 
     #endregion

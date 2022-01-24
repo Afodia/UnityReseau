@@ -20,7 +20,6 @@ public class UIPanel : MonoBehaviour
     int upgradeLevel = 0;
     TilesData currData;
     int currLvl;
-    int currPlayerId = 0;
 
     void Awake()
     {
@@ -48,7 +47,7 @@ public class UIPanel : MonoBehaviour
     }
 
 
-    public void ShowPanel(TilesData data, Sprite[] houses, int lvl, float money, int id)
+    public void ShowPanel(TilesData data, Sprite[] houses, int lvl, float money)
     {
         float toBuy = 0;
 
@@ -63,7 +62,6 @@ public class UIPanel : MonoBehaviour
         }
         currLvl = lvl;
         currData = data;
-        currPlayerId = id;
         upgradeCity.text = data.tileName;
     }
 
@@ -78,8 +76,8 @@ public class UIPanel : MonoBehaviour
 
     public void ValidateUpgrade()
     {
-        Debug.Log("bloup");
-        OnPlayerBoughtUpgrade?.Invoke(currPlayerId, upgradeLevel);
+
+        //OnPlayerBoughtUpgrade?.Invoke(currPlayerId, upgradeLevel);
     }
     #endregion
 }
