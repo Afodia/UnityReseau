@@ -25,7 +25,7 @@ public class BuyableTile : Tile
     {
         if (ownerId == 0)
             UpgradeTile(player);
-        else if (player.GetId() != ownerId)
+        else if (player.GetPlayerId() != ownerId)
             PayRent(player);
     }
 
@@ -40,10 +40,10 @@ public class BuyableTile : Tile
     {
         if (player.GetMoney() >= data.upgradePrice[0])
             player.OfferToUpgrade(data, new Sprite[4] { 
-                houses[player.GetId()],
-                houses[player.GetId() + 4 ],
-                houses[player.GetId() + 8 ],
-                houses[player.GetId() + 12]
+                houses[player.GetPlayerId() - 1],
+                houses[player.GetPlayerId() + 3],
+                houses[player.GetPlayerId() + 7],
+                houses[player.GetPlayerId() + 11]
             }, currLvl);
     }
 
@@ -79,6 +79,11 @@ public class BuyableTile : Tile
         price.text = "";
         if (overlay && over)
             over.sprite = overlay;
+    }
+
+    public override Vector3 GetPlayerPosition()
+    {
+        return playerPos.transform.position;
     }
 
     #endregion

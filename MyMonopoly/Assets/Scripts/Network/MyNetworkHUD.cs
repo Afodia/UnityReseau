@@ -54,7 +54,8 @@ namespace Mirror
         public void ReloadMainMenuScene()
         {
             Destroy(this.gameObject);
-            SceneManager.LoadScene(mainMenuSceneName);
+            NetworkManager.singleton.ServerChangeScene(mainMenuSceneName);
+            // SceneManager.LoadScene(mainMenuSceneName);
         }
 
         void Update()

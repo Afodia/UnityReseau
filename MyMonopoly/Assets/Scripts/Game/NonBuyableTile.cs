@@ -5,7 +5,10 @@ using Mirror;
 
 public class NonBuyableTile : Tile
 {
+    [SerializeField] GameObject playerPos;
+
     #region Server
+
     [Server]
     public override void Action(MyNetworkPlayer player)
     {
@@ -59,5 +62,12 @@ public class NonBuyableTile : Tile
         if (overlay && over)
             over.sprite = overlay;
     }
+
+    public override Vector3 GetPlayerPosition()
+    {
+        // return playerPos.transform.position;
+        return this.transform.position;
+    }
+
     #endregion
 }

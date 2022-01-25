@@ -28,9 +28,9 @@ public abstract class Tile : MonoBehaviour
     #endregion
 
     #region Client
-    private void Start()
-    {
-    }
+    void Start() { }
+
+    public abstract Vector3 GetPlayerPosition();
 
     #endregion
 }
