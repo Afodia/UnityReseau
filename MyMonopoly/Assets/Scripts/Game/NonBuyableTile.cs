@@ -33,7 +33,11 @@ public class NonBuyableTile : Tile
 
     [Server]
     private void GoToJailAction(MyNetworkPlayer player)
-    { }
+    {
+        // player.RpcSetPlayerAvatarPosition(this.playerPos.transform.position);
+        player.RpcSetPlayerAvatarPosition(this.transform.position);
+        player.SetInJail(true);
+    }
 
     [Server]
     private void JailAction(MyNetworkPlayer player)

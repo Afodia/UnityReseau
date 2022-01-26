@@ -9,14 +9,15 @@ public class MyNetworkPlayer : NetworkBehaviour
 {
     public static event Action<int> OnPlayerReady;
     public static event Action<int, float> OnMoneyChanged;
-    public int playerId;
-    public int clientId;
+    [SerializeField] int playerId;
+    [SerializeField] int clientId;
     [SyncVar(hook = nameof(HandleMoneyChange))]float money = 2000000f;
     NetworkConnection conn;
     bool isFirstBoardTurn = true;
     int nbMonopole = 0;
     int currTile = 0;
     int nbJailTurn = 0;
+    bool inJail = false;
 
     [SerializeField] GameObject[] playersUI = new GameObject[4];
     [Header("Dices")]
@@ -29,7 +30,8 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SerializeField] TMP_Text WinLoseText;
 
     [Header("UI")]
-    [SerializeField] SpriteRenderer PlayerAvatar;
+    [SerializeField] GameObject PlayerAvatar;
+    [SerializeField] SpriteRenderer PlayerAvatarColor;
 
     #region Server
 
@@ -72,38 +74,17 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     void HandleMoneyChange(float oldTotalMoney, float newTotalMoney)
     {
-        OnMoneyChanged?.Invoke(connectionToClient.connectionId, newTotalMoney);
+        OnMoneyChanged?.Invoke(this.playerId, newTotalMoney);
     }
 
     #endregion
     #region Client UI
 
-    [ClientRpc]
-    public void RpcSetPlayersUi(int nbPlayers)
+    [TargetRpc]
+    public void TargetSetPlayersUi(int nbPlayers)
     {
-        Color greenColor;
-        ColorUtility.TryParseHtmlString("#1AB600", out greenColor);
-        Color blueColor;
-        ColorUtility.TryParseHtmlString("#3600FF", out blueColor);
-        Color redColor;
-        ColorUtility.TryParseHtmlString("#FF0000", out redColor);
-        Color purpleColor;
-        ColorUtility.TryParseHtmlString("#A100D0", out purpleColor);
-
-        switch (this.playerId) {
-            case 1:
-                PlayerAvatar.color = greenColor;
-                break;
-            case 2:
-                PlayerAvatar.color = blueColor;
-                break;
-            case 3:
-                PlayerAvatar.color = redColor;
-                break;
-            case 4:
-                PlayerAvatar.color = purpleColor;
-                break;
-        }
+        if (!isLocalPlayer)
+            return;
 
         for (int i = 0; i < nbPlayers; i++)
             playersUI[i].SetActive(true);
@@ -148,7 +129,7 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     void UpdateDisplayMoneyOfPlayer(int id, float money)
     {
-       TMP_Text playerMoneyText = playersUI[id].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
+       TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
        playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}";
     }
 
@@ -205,8 +186,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     public void SetTile(int tile)
     {
         this.currTile = tile;
-        Vector3 tilePos = GameManager.instance.GetTilePosition(this.currTile);
-        PlayerAvatar.transform.position = new Vector3(tilePos.x, tilePos.y, 0);
     }
 
     [Server]
@@ -228,15 +207,52 @@ public class MyNetworkPlayer : NetworkBehaviour
     }
 
     [Server]
+    public void SetInJail(bool isInJail)
+    {
+        this.inJail = isInJail;
+    }
+
+    [Server]
+    public bool isInJail()
+    {
+        return this.inJail;
+    }
+
+    [Server]
+    public void IncreaseNbTurnInJail()
+    {
+        this.nbJailTurn++;
+    }
+
+    [Server]
+    public void ResetNbTurnInJail()
+    {
+        this.nbJailTurn = 0;
+    }
+
+    [Server]
+    public int GetNbTurnInJail()
+    {
+        return this.nbJailTurn;
+    }
+
+    [Server]
     public float GetMoney()
     {
         return this.money;
     }
 
-    [Server]
-    public void SetPlayerAvatarPosition(Vector3 newPosition)
+    [ClientRpc]
+    public void RpcSetPlayerAvatarPosition(Vector3 newPosition)
     {
-        PlayerAvatar.transform.position = newPosition;
+        PlayerAvatar.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
+        // PlayerAvatar.transform.position = newPosition;
+    }
+
+    [ClientRpc]
+    public void RpcSetPlayerAvatarColor(Color color)
+    {
+        PlayerAvatarColor.color = color;
     }
 
     [Server]

@@ -46,9 +46,6 @@ public class GameManager : NetworkBehaviour
         networkPlayers = players;
         currPlayer = players[rand];
 
-        foreach (MyNetworkPlayer p in networkPlayers)
-            currPlayer.RpcSetPlayersUi(networkPlayers.Count);
-
         MyNetworkRoomManager.OnAllGamePlayersReady += OnAllPlayersReady;
         MyNetworkPlayer.OnPlayerReady += OnPlayerReady;
 
@@ -100,6 +97,11 @@ public class GameManager : NetworkBehaviour
         currPlayer.HideDiceButton();
         currPlayer.RpcShowDices();
 
+        if (currPlayer.isInJail() && currPlayer.GetNbTurnInJail() >= 3) {
+            currPlayer.SetInJail(false);
+            currPlayer.ResetNbTurnInJail();
+        }
+
         int resDice1 = Random.Range(1, 6);
         int resDice2 = Random.Range(1, 6);
 
@@ -108,18 +110,25 @@ public class GameManager : NetworkBehaviour
         diceResult = resDice1 + resDice2;
         playAgain = false;
         if (resDice1 == resDice2) {
+            if (currPlayer.isInJail()) {
+                currPlayer.SetInJail(false);
+                currPlayer.ResetNbTurnInJail();
+            }
             nbDouble += 1;
             playAgain = true;
         }
-        if (nbDouble >= 3)
+        if (nbDouble >= 3) {
             Tiles[24].GetComponent<Tile>().Action(currPlayer);
+            playAgain = false;
+            currPhase = Phase.NextTurn;
+            PhaseChange();
+        }
+
+        if (currPlayer.isInJail())
+            currPlayer.IncreaseNbTurnInJail();
 
         currPhase = Phase.Move;
         PhaseChange();
-        //currentPlayer.ResNewDiceRoll(resDice1, resDice2);
-        //if (currentPlayer.GetNbConsecutiveDouble() == 3) {
-        // Go to jail
-        // then connectionToClient.identity.GetComponent<MyNetworkPlayer>().ResetNbConsecutiveDouble();
     }
 
     [Server]
@@ -132,7 +141,8 @@ public class GameManager : NetworkBehaviour
             Tiles[0].GetComponent<Tile>().Action(currPlayer);
             newPos %= (Tiles.Length - 1);
         }
-        currPlayer.SetTile(newPos); // visually move player
+        currPlayer.SetTile(newPos);
+        currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos));
 
         currPhase = Phase.TileAction;
         PhaseChange();
@@ -143,7 +153,9 @@ public class GameManager : NetworkBehaviour
     {
         // Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer);
 
+        Debug.Log($"1 playAgain : {playAgain}, Phase : {currPhase}");
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
+        Debug.Log($"2 playAgain : {playAgain}, Phase : {currPhase}");
         PhaseChange();
     }
 
@@ -155,10 +167,12 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
+        Debug.Log("current player turn : " + currPlayer.GetPlayerId());
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
-        if (nextPlayerId >= networkPlayers.Count)
-            nextPlayerId = 0;
-        currPlayer = networkPlayers[nextPlayerId];
+        if (nextPlayerId > networkPlayers.Count)
+            nextPlayerId = 1;
+        currPlayer = networkPlayers[nextPlayerId - 1];
+        Debug.Log("next player turn : " + currPlayer.GetPlayerId());
 
         currPhase = Phase.LaunchDice;
         PhaseChange();
@@ -168,13 +182,27 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("GameManager received event OnAllPlayersReady");
         OnAllPlayersReadyEventReceived?.Invoke();
-        foreach (MyNetworkPlayer p in networkPlayers)
-            currPlayer.RpcSetPlayersUi(networkPlayers.Count);
+
+        Color greenColor;
+        ColorUtility.TryParseHtmlString("#1AB600", out greenColor);
+        Color blueColor;
+        ColorUtility.TryParseHtmlString("#3600FF", out blueColor);
+        Color redColor;
+        ColorUtility.TryParseHtmlString("#FF0000", out redColor);
+        Color purpleColor;
+        ColorUtility.TryParseHtmlString("#A100D0", out purpleColor);
+
+        foreach (MyNetworkPlayer p in networkPlayers) {
+            p.TargetSetPlayersUi(networkPlayers.Count);
+            p.RpcSetPlayerAvatarPosition(this.GetTilePosition(0));
+            int playerId = p.GetPlayerId();
+            p.RpcSetPlayerAvatarColor(playerId == 1 ? greenColor : playerId == 2 ? blueColor : playerId == 3 ? redColor : playerId == 4 ? purpleColor : Color.white);
+        }
     }
 
     void OnPlayerReady(int playerId)
     {
-        networkPlayers[playerId].RpcSetPlayersUi(networkPlayers.Count);
+        networkPlayers[playerId].TargetSetPlayersUi(networkPlayers.Count);
     }
 
     #endregion
@@ -182,7 +210,6 @@ public class GameManager : NetworkBehaviour
 
     public Vector3 GetTilePosition(int tileId)
     {
-        Debug.Log("GetTilePosition : " + tileId);
         Tiles[tileId].TryGetComponent<BuyableTile>(out BuyableTile buyableTile);
         if (buyableTile != null)
             return buyableTile.GetPlayerPosition();
@@ -200,28 +227,5 @@ public class GameManager : NetworkBehaviour
     }
 
     #endregion
-
-    //// public override void OnStartClient()
-    //void Start()
-    //{
-    //    myNetworkRoomManagerObj = GameObject.Find("MyNetworkRoomManager");
-    //    myNetworkRoomManagerScript = myNetworkRoomManagerObj.GetComponent<MyNetworkRoomManager>();
-
-    //    // MyNetworkRoomManager.OnPlayerAdded += OnPlayerAdd;
-    //    MyNetworkRoomManager.OnAllGamePlayersReady += HandleAllGamePlayersReady;
-
-
-    //    UIPanel.OnPlayerBoughtUpgrade += TargetPlayerBoughtUpgrade;
-    //}
-
-    //void OnDestroy()
-    //{
-    //    MyNetworkRoomManager.OnAllGamePlayersReady += HandleAllGamePlayersReady;
-    //    // MyNetworkRoomManager.OnPlayerAdded -= OnPlayerAdd;
-
-    //    MyNetworkPlayer.OnMoneyChanged -= UpdateDisplayMoneyOfPlayer;
-
-    //    UIPanel.OnPlayerBoughtUpgrade -= TargetPlayerBoughtUpgrade;
-    //}
 
 }
