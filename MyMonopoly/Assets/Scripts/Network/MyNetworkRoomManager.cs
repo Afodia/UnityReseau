@@ -120,22 +120,17 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// <returns>False to not allow this player to replace the room player.</returns>
     public override bool OnRoomServerSceneLoadedForPlayer(NetworkConnection conn, GameObject roomPlayer, GameObject gamePlayer)
     {
-        Debug.Log("OnRoomServerSceneLoadedForPlayer");
         MyNetworkRoomPlayer myRoomPlayer = roomPlayer.GetComponent<MyNetworkRoomPlayer>();
         MyNetworkPlayer networkPlayer = gamePlayer.GetComponent<MyNetworkPlayer>();
         networkPlayer.SetClientId(myRoomPlayer.index);
-        networkPlayer.SetPlayerId(nbInGamePlayersReady + 1);
+        networkPlayer.SetPlayerId(myRoomPlayer.index + 1);
+        Debug.Log(networkPlayer.GetPlayerId());
         networkPlayer.SetConn(conn);
         players.Add(networkPlayer);
-        OnPlayerAdded?.Invoke();
 
         nbInGamePlayersReady++;
-        if (CheckIfAllInGamePlayersReady()) {
-            Debug.Log("All players ready");
+        if (CheckIfAllInGamePlayersReady())
             FindObjectOfType<GameManager>().StartGame(players);
-            //OnAllGamePlayersReady?.Invoke();
-            // this.NextTurn();
-        }
 
         return true;
     }
@@ -235,7 +230,6 @@ public class MyNetworkRoomManager : NetworkRoomManager
 
     int nbInGamePlayersReady = 0;
     public static event Action OnAllGamePlayersReady;
-    public static event Action OnPlayerAdded;
     List<MyNetworkPlayer> players = new List<MyNetworkPlayer>();
     bool gameManagerReceivedEvent = false;
 

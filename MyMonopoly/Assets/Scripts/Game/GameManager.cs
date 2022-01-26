@@ -202,7 +202,7 @@ public class GameManager : NetworkBehaviour
 
     void OnPlayerReady(int playerId)
     {
-        networkPlayers[playerId].TargetSetPlayersUi(networkPlayers.Count);
+        // networkPlayers[playerId - 1].TargetSetPlayersUi(networkPlayers.Count);
     }
 
     #endregion

@@ -9,8 +9,8 @@ public class MyNetworkPlayer : NetworkBehaviour
 {
     public static event Action<int> OnPlayerReady;
     public static event Action<int, float> OnMoneyChanged;
-    [SerializeField] int playerId;
-    [SerializeField] int clientId;
+    [SerializeField] int playerId = 0;
+    [SerializeField] int clientId = 0;
     [SyncVar(hook = nameof(HandleMoneyChange))]float money = 2000000f;
     NetworkConnection conn;
     bool isFirstBoardTurn = true;
@@ -36,8 +36,8 @@ public class MyNetworkPlayer : NetworkBehaviour
     #region Server
 
     void Start() {
-        if (isLocalPlayer)
-            OnPlayerReady?.Invoke(this.playerId);
+        // if (isLocalPlayer)
+        //     OnPlayerReady?.Invoke(this.playerId);
 
         MyNetworkPlayer.OnMoneyChanged += UpdateDisplayMoneyOfPlayer;
     }
@@ -88,6 +88,9 @@ public class MyNetworkPlayer : NetworkBehaviour
 
         for (int i = 0; i < nbPlayers; i++)
             playersUI[i].SetActive(true);
+
+        Debug.Log($"playerid : {playerId}");
+        playersUI[this.playerId - 1].transform.Find("PlayerName").GetComponent<TMP_Text>().text = $"Player {this.playerId} (me)";
     }
 
     [ClientRpc]

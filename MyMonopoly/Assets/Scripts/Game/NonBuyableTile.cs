@@ -5,7 +5,7 @@ using Mirror;
 
 public class NonBuyableTile : Tile
 {
-    [SerializeField] GameObject playerPos;
+    [SerializeField] GameObject playerPos = null;
 
     #region Server
 
