@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 
 public class GameManager : NetworkBehaviour
 {
+    [SerializeField] GameObject playerPrefab;
     [SerializeField] GameObject[] Tiles;
     public static GameManager instance;
     private GameManager() { }
@@ -24,13 +25,14 @@ public class GameManager : NetworkBehaviour
     {
         WaitingStart,
         LaunchDice,
+        WaitRolling,
         Move,
         TileAction,
         NextTurn
     }
 
     Phase currPhase = Phase.WaitingStart;
-    List<MyNetworkPlayer> networkPlayers;// = new List<MyNetworkPlayer>();
+    List<MyNetworkPlayer> networkPlayers = new List<MyNetworkPlayer>();
     MyNetworkPlayer currPlayer;
     int nbDouble = 0;
     bool playAgain = false;
@@ -41,22 +43,24 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void StartGame(List<MyNetworkPlayer> players)
     {
-        int rand = Random.Range(0, players.Count - 1);
-
-        networkPlayers = players;
-        currPlayer = players[rand];
-
-        MyNetworkRoomManager.OnAllGamePlayersReady += OnAllPlayersReady;
-        MyNetworkPlayer.OnPlayerReady += OnPlayerReady;
-
-        currPhase = Phase.LaunchDice;
-        PhaseChange();
+        StartCoroutine(WaitingForPlayer(players));
     }
 
-    void OnDestroy() {
-        MyNetworkRoomManager.OnAllGamePlayersReady -= OnAllPlayersReady;
-        MyNetworkPlayer.OnPlayerReady -= OnPlayerReady;
-
+    [Server]
+    IEnumerator WaitingForPlayer(List<MyNetworkPlayer> players)
+    {
+        int rand = Random.Range(0, players.Count - 1);
+        for (int i = 0 ; i < players.Count ; i++) {
+            networkPlayers.Add(players[i]);
+            yield return new WaitUntil(() => networkPlayers[i].isReady == true);
+            networkPlayers[i].SetClientId(players[i].GetClientId());
+            networkPlayers[i].SetPlayerId(i + 1);
+            networkPlayers[i].TargetSetPlayerId(i + 1);
+        }
+        currPlayer = networkPlayers[rand];
+        SetPlayersUI();
+        currPhase = Phase.LaunchDice;
+        PhaseChange();
     }
 
     [Server]
@@ -75,6 +79,9 @@ public class GameManager : NetworkBehaviour
             case Phase.NextTurn:
                 OnNextTurnPhase();
                 break;
+            case Phase.WaitRolling:
+                StartCoroutine(OnWaitRollingPhase());
+                break;
         }
     }
 
@@ -87,14 +94,14 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnLaunchDicePhase()
     {
-        currPlayer.ShowDiceButton();
+        currPlayer.TargetShowDiceButton();
     }
 
     [Server]
     void RollDices()
     {
         Debug.Log("rollDice");
-        currPlayer.HideDiceButton();
+        currPlayer.TargetHideDiceButton();
         currPlayer.RpcShowDices();
 
         if (currPlayer.isInJail() && currPlayer.GetNbTurnInJail() >= 3) {
@@ -106,7 +113,6 @@ public class GameManager : NetworkBehaviour
         int resDice2 = Random.Range(1, 6);
 
         currPlayer.RpcRollDices(resDice1, resDice2);
-
         diceResult = resDice1 + resDice2;
         playAgain = false;
         if (resDice1 == resDice2) {
@@ -117,18 +123,29 @@ public class GameManager : NetworkBehaviour
             nbDouble += 1;
             playAgain = true;
         }
-        if (nbDouble >= 3) {
-            Tiles[24].GetComponent<Tile>().Action(currPlayer);
-            playAgain = false;
-            currPhase = Phase.NextTurn;
-            PhaseChange();
-        }
 
         if (currPlayer.isInJail())
             currPlayer.IncreaseNbTurnInJail();
 
-        currPhase = Phase.Move;
+        currPhase = Phase.WaitRolling;
         PhaseChange();
+    }
+
+    [Server]
+    IEnumerator OnWaitRollingPhase()
+    {
+        Debug.Log("wait rolling");
+        yield return new WaitUntil(() => !currPlayer.launchingDice);
+        Debug.Log("rolling done");
+        currPlayer.RpcHideDices();
+        if (nbDouble >= 3) {
+            Tiles[24].GetComponent<Tile>().Action(currPlayer);
+            playAgain = false;
+            currPhase = Phase.NextTurn;
+        } else
+            currPhase = Phase.Move;
+        PhaseChange();
+
     }
 
     [Server]
@@ -162,10 +179,10 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
-        if (NetworkServer.connections.Count <= 1) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last survivor !");
-            return;
-        }
+        //if (NetworkServer.connections.Count <= 1) {
+        //    currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
+        //    return;
+        //}
 
         Debug.Log("current player turn : " + currPlayer.GetPlayerId());
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
@@ -178,11 +195,9 @@ public class GameManager : NetworkBehaviour
         PhaseChange();
     }
 
-    void OnAllPlayersReady()
+    [Server]
+    void SetPlayersUI()
     {
-        Debug.Log("GameManager received event OnAllPlayersReady");
-        OnAllPlayersReadyEventReceived?.Invoke();
-
         Color greenColor;
         ColorUtility.TryParseHtmlString("#1AB600", out greenColor);
         Color blueColor;

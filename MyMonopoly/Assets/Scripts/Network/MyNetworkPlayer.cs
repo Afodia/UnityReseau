@@ -33,12 +33,16 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SerializeField] GameObject PlayerAvatar;
     [SerializeField] SpriteRenderer PlayerAvatarColor;
 
+    public bool isReady = false;
+    public bool launchingDice = true;
+
     #region Server
 
     void Start() {
         // if (isLocalPlayer)
         //     OnPlayerReady?.Invoke(this.playerId);
-
+        Debug.Log("start player");
+        isReady = true;
         MyNetworkPlayer.OnMoneyChanged += UpdateDisplayMoneyOfPlayer;
     }
 
@@ -79,7 +83,6 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     #endregion
     #region Client UI
-
     [TargetRpc]
     public void TargetSetPlayersUi(int nbPlayers)
     {
@@ -105,12 +108,14 @@ public class MyNetworkPlayer : NetworkBehaviour
         Dices.SetActive(false);
     }
 
-    public void ShowDiceButton()
+    [TargetRpc]
+    public void TargetShowDiceButton()
     {
         DicesButton.SetActive(true);
     }
 
-    public void HideDiceButton()
+    [TargetRpc]
+    public void TargetHideDiceButton()
     {
         DicesButton.SetActive(false);
     }
@@ -118,9 +123,13 @@ public class MyNetworkPlayer : NetworkBehaviour
     [Client]
     IEnumerator DisplayDicesRolling(int resDice1, int resDice2)
     {
-        yield return Dices.GetComponentsInChildren<RollTheDice>()[0].Roll(resDice1);
-        yield return Dices.GetComponentsInChildren<RollTheDice>()[1].Roll(resDice2);
-        yield return new WaitForSeconds(2.5f);
+        launchingDice = true;
+        Dices.GetComponentsInChildren<RollTheDice>()[0].Roll(resDice1);
+        Dices.GetComponentsInChildren<RollTheDice>()[1].Roll(resDice2);
+        yield return new WaitUntil(() => !Dices.GetComponentsInChildren<RollTheDice>()[0].isRolling);
+        yield return new WaitUntil(() => !Dices.GetComponentsInChildren<RollTheDice>()[1].isRolling);
+        yield return new WaitForSeconds(1f);
+        launchingDice = false;
     }
 
 
@@ -167,6 +176,12 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         this.playerId = id;
     }
+    
+    [TargetRpc]
+    public void TargetSetPlayerId(int id)
+    {
+        this.playerId = id;
+    }
 
     [Server]
     public int GetPlayerId()
@@ -174,6 +189,7 @@ public class MyNetworkPlayer : NetworkBehaviour
         return this.playerId;
     }
 
+    [Server]
     public void SetClientId(int id)
     {
         this.clientId = id;

@@ -999,6 +999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  playerPrefab: {fileID: 4905018407376609034, guid: 597d75599d58d7e46b1a2a3ce9cb8233, type: 3}
   Tiles:
   - {fileID: 1371756822}
   - {fileID: 884093298}

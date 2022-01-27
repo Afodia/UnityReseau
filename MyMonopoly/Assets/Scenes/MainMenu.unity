@@ -2705,6 +2705,7 @@ GameObject:
   - component: {fileID: 1418491331}
   - component: {fileID: 1418491330}
   - component: {fileID: 1418491332}
+  - component: {fileID: 1418491335}
   m_Layer: 0
   m_Name: MyNetworkRoomManager
   m_TagString: Untagged
@@ -2809,6 +2810,18 @@ MonoBehaviour:
   ipAddress: {fileID: 1094518729}
   connectGameButton: {fileID: 793988235}
   joinGameButton: {fileID: 2074932141}
+--- !u!114 &1418491335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1418491326}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a6dc4ae386c02e4c89129681a02ca86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1665421595
 GameObject:
   m_ObjectHideFlags: 0

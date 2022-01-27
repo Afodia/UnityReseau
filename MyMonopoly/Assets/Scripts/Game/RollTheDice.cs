@@ -10,6 +10,7 @@ public class RollTheDice : MonoBehaviour
     RawImage rend;
 
     public int finalSide = 0;
+    public bool isRolling = true;
 
     void Awake()
     {
@@ -42,24 +43,26 @@ public class RollTheDice : MonoBehaviour
     }
     */
 
-    public int Roll(int finalSide)
+    public void Roll(int finalSide)
     {
+        isRolling = true;
         this.finalSide = finalSide;
         StartCoroutine(IERollTheDice());
-        return this.finalSide;
     }
 
     IEnumerator IERollTheDice()
     {
-        int randomDiceSide = 0;
+        int randomDiceSide;
 
-        for (int i = 0; i <= 20; i++) {
+        for (int i = 0; i <= 10; i++) {
+            Debug.Log("rolling...");
             randomDiceSide = Random.Range(0, 5);
             rend.texture = diceSides[randomDiceSide];
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.1f);
         }
 
         rend.texture = diceSides[finalSide - 1];
+        isRolling = false;
     }
 
 }

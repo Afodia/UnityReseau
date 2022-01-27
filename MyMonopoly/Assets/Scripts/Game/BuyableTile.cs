@@ -20,7 +20,8 @@ public class BuyableTile : Tile
     private int currLvl = 0;
 
     #region Server
-    //[Server]
+    
+    [Server]
     public override void Action(MyNetworkPlayer player)
     {
         if (ownerId == 0)
@@ -35,7 +36,8 @@ public class BuyableTile : Tile
         if (ownerId != 0)
             return;
     }
-    //[Server]
+
+    [Server]
     private void UpgradeTile(MyNetworkPlayer player)
     {
         if (player.GetMoney() >= data.upgradePrice[0])

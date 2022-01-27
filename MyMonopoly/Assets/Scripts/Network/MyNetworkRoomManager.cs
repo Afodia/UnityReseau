@@ -62,13 +62,15 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// This is called on the server when a new client connects to the server.
     /// </summary>
     /// <param name="conn">The new connection.</param>
-    public override void OnRoomServerConnect(NetworkConnection conn) { }
+    public override void OnRoomServerConnect(NetworkConnection conn) {
+    }
 
     /// <summary>
     /// This is called on the server when a client disconnects.
     /// </summary>
     /// <param name="conn">The connection that disconnected.</param>
-    public override void OnRoomServerDisconnect(NetworkConnection conn) { }
+    public override void OnRoomServerDisconnect(NetworkConnection conn) {
+    }
 
     /// <summary>
     /// This is called on the server when a networked scene finishes loading.
@@ -123,8 +125,8 @@ public class MyNetworkRoomManager : NetworkRoomManager
         MyNetworkRoomPlayer myRoomPlayer = roomPlayer.GetComponent<MyNetworkRoomPlayer>();
         MyNetworkPlayer networkPlayer = gamePlayer.GetComponent<MyNetworkPlayer>();
         networkPlayer.SetClientId(myRoomPlayer.index);
-        networkPlayer.SetPlayerId(myRoomPlayer.index + 1);
-        Debug.Log(networkPlayer.GetPlayerId());
+        //networkPlayer.SetPlayerId(myRoomPlayer.index + 1);
+        //Debug.Log(networkPlayer.GetPlayerId());
         networkPlayer.SetConn(conn);
         players.Add(networkPlayer);
 
@@ -148,7 +150,8 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// This is called on the server when CheckReadyToBegin finds that players are not ready
     /// <para>May be called multiple times while not ready players are joining</para>
     /// </summary>
-    public override void OnRoomServerPlayersNotReady() { }
+    public override void OnRoomServerPlayersNotReady() {
+    }
 
     #endregion
 
@@ -241,16 +244,23 @@ public class MyNetworkRoomManager : NetworkRoomManager
 
     bool CheckIfAllInGamePlayersReady()
     {
+        //int nbPlayersReady = 0;
+        //foreach (MyNetworkPlayer p in players) {
+        //    if (p.GetPlayerId() != 0)
+        //        nbPlayersReady++;
+        //}
+        //Debug.Log(NetworkServer.connections.Count);
+        //return nbPlayersReady == NetworkServer.connections.Count;
         return (nbInGamePlayersReady == NetworkServer.connections.Count);
     }
 
     void Update()
     {
         // Debug.Log("nbInGamePlayersReady: " + nbInGamePlayersReady + " / " + NetworkServer.connections.Count);
-        if (!gameManagerReceivedEvent && CheckIfAllInGamePlayersReady()) {
-            OnAllGamePlayersReady?.Invoke();
-            GameManager.OnAllPlayersReadyEventReceived += OnGameManagerReceivedEvent;
-        }
+        //if (!gameManagerReceivedEvent && CheckIfAllInGamePlayersReady()) {
+        //    OnAllGamePlayersReady?.Invoke();
+        //    GameManager.OnAllPlayersReadyEventReceived += OnGameManagerReceivedEvent;
+        //}
     }
 
     void OnGameManagerReceivedEvent()

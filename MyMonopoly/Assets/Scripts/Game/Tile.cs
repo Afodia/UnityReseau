@@ -24,6 +24,13 @@ public abstract class Tile : MonoBehaviour
     };
 
     #region Server
+    [Server]
+    public int GetId()
+    {
+        Debug.Log($"id : {_id}");
+        return _id;
+    }
+
     public abstract void Action(MyNetworkPlayer player);
     #endregion
 
