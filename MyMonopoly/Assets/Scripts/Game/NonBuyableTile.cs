@@ -5,7 +5,7 @@ using Mirror;
 
 public class NonBuyableTile : Tile
 {
-    [SerializeField] GameObject playerPos = null;
+    [SerializeField] GameObject[] playerPos;
 
     #region Server
 
@@ -34,8 +34,6 @@ public class NonBuyableTile : Tile
     [Server]
     private void GoToJailAction(MyNetworkPlayer player)
     {
-        // player.RpcSetPlayerAvatarPosition(this.playerPos.transform.position);
-        player.RpcSetPlayerAvatarPosition(this.transform.position);
         player.SetInJail(true);
     }
 
@@ -54,7 +52,7 @@ public class NonBuyableTile : Tile
     [Server]
     private void StartAction(MyNetworkPlayer player)
     {
-        player.ChangeMoney(300000);
+        player.RpcChangeMoney(300000);
     }
 
     #endregion
@@ -67,10 +65,9 @@ public class NonBuyableTile : Tile
             over.sprite = overlay;
     }
 
-    public override Vector3 GetPlayerPosition()
+    public override Vector3 GetPlayerPosition(int playerId)
     {
-        // return playerPos.transform.position;
-        return this.transform.position;
+        return playerPos[playerId - 1].transform.position;
     }
 
     #endregion

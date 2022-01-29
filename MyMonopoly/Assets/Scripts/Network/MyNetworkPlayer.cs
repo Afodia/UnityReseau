@@ -7,14 +7,13 @@ using TMPro;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
-    public static event Action<int> OnPlayerReady;
     public static event Action<int, float> OnMoneyChanged;
-    [SerializeField] int playerId = 0;
-    [SerializeField] int clientId = 0;
+    /*[SerializeField]*/ int playerId = 0;
+    /*[SerializeField]*/ int clientId = 0;
     [SyncVar(hook = nameof(HandleMoneyChange))]float money = 2000000f;
     NetworkConnection conn;
     bool isFirstBoardTurn = true;
-    int nbMonopole = 0;
+    int nbMonopolies = 0;
     int currTile = 0;
     int nbJailTurn = 0;
     bool inJail = false;
@@ -38,15 +37,14 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     #region Server
 
-    void Start() {
-        // if (isLocalPlayer)
-        //     OnPlayerReady?.Invoke(this.playerId);
-        Debug.Log("start player");
+    void Start()
+    {
         isReady = true;
         MyNetworkPlayer.OnMoneyChanged += UpdateDisplayMoneyOfPlayer;
     }
 
-    void OnDestroy() {
+    void OnDestroy()
+    {
         MyNetworkPlayer.OnMoneyChanged -= UpdateDisplayMoneyOfPlayer;
     }
 
@@ -92,7 +90,6 @@ public class MyNetworkPlayer : NetworkBehaviour
         for (int i = 0; i < nbPlayers; i++)
             playersUI[i].SetActive(true);
 
-        Debug.Log($"playerid : {playerId}");
         playersUI[this.playerId - 1].transform.Find("PlayerName").GetComponent<TMP_Text>().text = $"Player {this.playerId} (me)";
     }
 
@@ -120,6 +117,30 @@ public class MyNetworkPlayer : NetworkBehaviour
         DicesButton.SetActive(false);
     }
 
+    [TargetRpc]
+    public void SetIsFirstBoardTurn(bool value)
+    {
+        this.isFirstBoardTurn = value;
+    }
+
+    [Server]
+    public bool GetIsFirstBoardTurn()
+    {
+        return this.isFirstBoardTurn;
+    }
+
+    [TargetRpc]
+    public void SetNbMonopolies(int nbMonopolies)
+    {
+        this.nbMonopolies = nbMonopolies;
+    }
+
+    [Server]
+    public int GetNbMonopolies()
+    {
+        return this.nbMonopolies;
+    }
+
     [Client]
     IEnumerator DisplayDicesRolling(int resDice1, int resDice2)
     {
@@ -132,6 +153,11 @@ public class MyNetworkPlayer : NetworkBehaviour
         launchingDice = false;
     }
 
+    [Client]
+    public void ResetLaunchingDice()
+    {
+        launchingDice = true;
+    }
 
     [Client]
     private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
@@ -265,7 +291,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     public void RpcSetPlayerAvatarPosition(Vector3 newPosition)
     {
         PlayerAvatar.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
-        // PlayerAvatar.transform.position = newPosition;
     }
 
     [ClientRpc]
@@ -274,8 +299,8 @@ public class MyNetworkPlayer : NetworkBehaviour
         PlayerAvatarColor.color = color;
     }
 
-    [Server]
-    public void ChangeMoney(float amount)
+    [ClientRpc]
+    public void RpcChangeMoney(float amount)
     {
         if (amount > 0)
             money += amount;

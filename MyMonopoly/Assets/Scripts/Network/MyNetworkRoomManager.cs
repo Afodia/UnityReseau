@@ -23,19 +23,6 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public class MyNetworkRoomManager : NetworkRoomManager
 {
-    //public static MyNetworkRoomManager instance;
-    //private MyNetworkRoomManager() { }
-
-    //public override void Awake()
-    //{
-    //    base.Awake();
-
-    //    if (instance != null && instance != this)
-    //        Destroy(gameObject);
-
-    //    instance = this;
-    //}
-
     #region Server Callbacks
 
     /// <summary>
@@ -232,40 +219,16 @@ public class MyNetworkRoomManager : NetworkRoomManager
     #region Game Loop Management
 
     int nbInGamePlayersReady = 0;
-    public static event Action OnAllGamePlayersReady;
     List<MyNetworkPlayer> players = new List<MyNetworkPlayer>();
-    bool gameManagerReceivedEvent = false;
 
     public override void Start()
     {
         base.Start();
-        GameManager.OnAllPlayersReadyEventReceived += OnGameManagerReceivedEvent;
     }
 
     bool CheckIfAllInGamePlayersReady()
     {
-        //int nbPlayersReady = 0;
-        //foreach (MyNetworkPlayer p in players) {
-        //    if (p.GetPlayerId() != 0)
-        //        nbPlayersReady++;
-        //}
-        //Debug.Log(NetworkServer.connections.Count);
-        //return nbPlayersReady == NetworkServer.connections.Count;
         return (nbInGamePlayersReady == NetworkServer.connections.Count);
-    }
-
-    void Update()
-    {
-        // Debug.Log("nbInGamePlayersReady: " + nbInGamePlayersReady + " / " + NetworkServer.connections.Count);
-        //if (!gameManagerReceivedEvent && CheckIfAllInGamePlayersReady()) {
-        //    OnAllGamePlayersReady?.Invoke();
-        //    GameManager.OnAllPlayersReadyEventReceived += OnGameManagerReceivedEvent;
-        //}
-    }
-
-    void OnGameManagerReceivedEvent()
-    {
-        gameManagerReceivedEvent = true;
     }
 
     #endregion

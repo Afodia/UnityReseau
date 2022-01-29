@@ -12,7 +12,7 @@ public class BuyableTile : Tile
     [SerializeField] TextMeshPro cityName;
     [SerializeField] TextMeshPro price;
     [SerializeField] SpriteRenderer house;
-    [SerializeField] GameObject playerPos;
+    [SerializeField] GameObject[] playerPos;
     [SerializeField] Sprite[] houses = new Sprite[16];
 
     private bool isMonopole = false;
@@ -83,9 +83,9 @@ public class BuyableTile : Tile
             over.sprite = overlay;
     }
 
-    public override Vector3 GetPlayerPosition()
+    public override Vector3 GetPlayerPosition(int playerId)
     {
-        return playerPos.transform.position;
+        return playerPos[playerId - 1].transform.position;
     }
 
     #endregion
