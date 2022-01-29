@@ -7,7 +7,7 @@ using TMPro;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
-    /*[SerializeField]*/ int playerId = 0;
+    [SerializeField] int playerId = 0;
     /*[SerializeField]*/ int clientId = 0;
     float money = 2000000f;
     NetworkConnection conn;
@@ -46,6 +46,7 @@ public class MyNetworkPlayer : NetworkBehaviour
        if (isLocalPlayer && Input.GetKeyDown(KeyCode.Escape))
            PauseMenu.SetActive(!PauseMenu.activeSelf);
     }
+
 
     [Server]
     public void MustSell(float needToBePaid)
@@ -154,10 +155,9 @@ public class MyNetworkPlayer : NetworkBehaviour
         //UIPanel.instance.ShowPanel(price, houses, lvl, money, connectionToClient.connectionId);
     }
 
-    [ClientRpc]
-    public void RpcUpdateDisplayMoneyOfPlayer(int id, float money)
+    [TargetRpc]
+    public void UpdateDisplayMoneyOfPlayer(int id, float money)
     {
-        Debug.Log($"On player {this.playerId} change money of player {id} to {money}");
         TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
         playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}";
     }
@@ -305,7 +305,7 @@ public class MyNetworkPlayer : NetworkBehaviour
             MustSell(amount);
         }
 
-        this.RpcUpdateDisplayMoneyOfPlayer(this.playerId, this.money);
+//        RpcUpdateDisplayMoneyOfPlayer(this.playerId, this.money);
     }
 
     #endregion

@@ -124,8 +124,9 @@ public class GameManager : NetworkBehaviour
             playAgain = true;
         }
 
-        if (currPlayer.isInJail())
+        if (currPlayer.isInJail()) {
             currPlayer.IncreaseNbTurnInJail();
+        }
 
         currPhase = Phase.WaitRolling;
         PhaseChange();
@@ -154,6 +155,7 @@ public class GameManager : NetworkBehaviour
 
         if (newPos > Tiles.Length - 1) {
             Tiles[0].GetComponent<Tile>().Action(currPlayer);
+            ChangeMoneyDisplayed();
             newPos %= (Tiles.Length - 1);
         }
         currPlayer.SetTile(newPos);
@@ -161,6 +163,15 @@ public class GameManager : NetworkBehaviour
 
         currPhase = Phase.TileAction;
         PhaseChange();
+    }
+
+    [Server]
+    private void ChangeMoneyDisplayed()
+    {
+        foreach (MyNetworkPlayer p in networkPlayers) {
+            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
+        }
+        return;
     }
     
     [Server]
@@ -184,7 +195,6 @@ public class GameManager : NetworkBehaviour
         if (nextPlayerId > networkPlayers.Count)
             nextPlayerId = 1;
         currPlayer = networkPlayers[nextPlayerId - 1];
-
         nbDouble = 0;
         currPhase = Phase.LaunchDice;
         PhaseChange();
