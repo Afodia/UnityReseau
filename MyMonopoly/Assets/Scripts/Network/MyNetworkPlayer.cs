@@ -7,10 +7,9 @@ using TMPro;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
-    public static event Action<int, float> OnMoneyChanged;
     /*[SerializeField]*/ int playerId = 0;
     /*[SerializeField]*/ int clientId = 0;
-    [SyncVar(hook = nameof(HandleMoneyChange))]float money = 2000000f;
+    float money = 2000000f;
     NetworkConnection conn;
     bool isFirstBoardTurn = true;
     int nbMonopolies = 0;
@@ -40,12 +39,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     void Start()
     {
         isReady = true;
-        MyNetworkPlayer.OnMoneyChanged += UpdateDisplayMoneyOfPlayer;
-    }
-
-    void OnDestroy()
-    {
-        MyNetworkPlayer.OnMoneyChanged -= UpdateDisplayMoneyOfPlayer;
     }
 
     void Update()
@@ -56,7 +49,9 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     [Server]
     public void MustSell(float needToBePaid)
-    { }
+    {
+
+    }
 
     #endregion
     #region Client
@@ -71,12 +66,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         //if (!hasAuthority)
         DisplayUpgradeOffer(upgradePrice, houses, lvl);
-    }
-
-
-    void HandleMoneyChange(float oldTotalMoney, float newTotalMoney)
-    {
-        OnMoneyChanged?.Invoke(this.playerId, newTotalMoney);
     }
 
     #endregion
@@ -165,10 +154,12 @@ public class MyNetworkPlayer : NetworkBehaviour
         //UIPanel.instance.ShowPanel(price, houses, lvl, money, connectionToClient.connectionId);
     }
 
-    void UpdateDisplayMoneyOfPlayer(int id, float money)
+    [ClientRpc]
+    public void RpcUpdateDisplayMoneyOfPlayer(int id, float money)
     {
-       TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
-       playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}";
+        Debug.Log($"On player {this.playerId} change money of player {id} to {money}");
+        TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
+        playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}";
     }
 
     [ClientRpc]
@@ -299,8 +290,8 @@ public class MyNetworkPlayer : NetworkBehaviour
         PlayerAvatarColor.color = color;
     }
 
-    [ClientRpc]
-    public void RpcChangeMoney(float amount)
+    [Server]
+    public void ChangeMoney(float amount)
     {
         if (amount > 0)
             money += amount;
@@ -309,27 +300,12 @@ public class MyNetworkPlayer : NetworkBehaviour
             money -= amount;
         else {
             amount *= -1;
-            amount -= (int)money;
+            amount -= money;
             money = 0;
             MustSell(amount);
         }
-    }
 
-    #endregion
-    #region Utils
-
-    string SplitNumberString3By3(string numberString)
-    {
-       string result = "";
-       int i = numberString.Length - 1;
-
-       while (i >= 0) {
-           result = numberString[i] + result;
-           i -= 3;
-           if (i >= 0)
-               result = " " + result;
-       }
-       return result;
+        this.RpcUpdateDisplayMoneyOfPlayer(this.playerId, this.money);
     }
 
     #endregion

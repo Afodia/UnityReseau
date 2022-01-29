@@ -10,11 +10,11 @@ public class NonBuyableTile : Tile
     #region Server
 
     [Server]
-    public override void Action(MyNetworkPlayer player)
+    public override void Action(MyNetworkPlayer player, int tileId)
     {
         switch (type) {
             case Type.GoToJail:
-                GoToJailAction(player);
+                GoToJailAction(player, tileId);
                 break;
             case Type.Jail:
                 JailAction(player);
@@ -32,9 +32,11 @@ public class NonBuyableTile : Tile
     }
 
     [Server]
-    private void GoToJailAction(MyNetworkPlayer player)
+    private void GoToJailAction(MyNetworkPlayer player, int tileId)
     {
         player.SetInJail(true);
+        player.SetTile(tileId);
+        player.RpcSetPlayerAvatarPosition(GameManager.instance.GetTilePosition(tileId, player.GetPlayerId()));
     }
 
     [Server]
@@ -52,7 +54,11 @@ public class NonBuyableTile : Tile
     [Server]
     private void StartAction(MyNetworkPlayer player)
     {
-        player.RpcChangeMoney(300000);
+        if (player.GetIsFirstBoardTurn())
+            player.SetIsFirstBoardTurn(false);
+
+        player.ChangeMoney(300000);
+        // player.RpcUpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
     }
 
     #endregion

@@ -55,7 +55,6 @@ public class RollTheDice : MonoBehaviour
         int randomDiceSide;
 
         for (int i = 0; i <= 10; i++) {
-            Debug.Log("rolling...");
             randomDiceSide = Random.Range(0, 5);
             rend.texture = diceSides[randomDiceSide];
             yield return new WaitForSeconds(0.1f);

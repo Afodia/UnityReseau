@@ -99,6 +99,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     void RollDices()
     {
+        playAgain = false;
         currPlayer.TargetHideDiceButton();
         currPlayer.RpcShowDices();
 
@@ -109,12 +110,10 @@ public class GameManager : NetworkBehaviour
 
         int resDice1 = Random.Range(1, 6);
         int resDice2 = Random.Range(1, 6);
+        diceResult = resDice1 + resDice2;
 
         currPlayer.RpcRollDices(resDice1, resDice2);
         currPlayer.ResetLaunchingDice();
-
-        diceResult = resDice1 + resDice2;
-        playAgain = false;
 
         if (resDice1 == resDice2) {
             if (currPlayer.isInJail()) {
@@ -138,9 +137,8 @@ public class GameManager : NetworkBehaviour
         yield return new WaitUntil(() => !currPlayer.launchingDice);
         currPlayer.RpcHideDices();
 
-        if (nbDouble >= 3) {
-            Tiles[24].GetComponent<Tile>().Action(currPlayer);
-            currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(8, currPlayer.GetPlayerId()));
+        if (nbDouble >= 3 || currPlayer.isInJail()) {
+            Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
             currPhase = Phase.NextTurn;
         } else
@@ -168,7 +166,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnTileActionPhase()
     {
-        // Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer);
+        Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
 
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
@@ -187,6 +185,7 @@ public class GameManager : NetworkBehaviour
             nextPlayerId = 1;
         currPlayer = networkPlayers[nextPlayerId - 1];
 
+        nbDouble = 0;
         currPhase = Phase.LaunchDice;
         PhaseChange();
     }

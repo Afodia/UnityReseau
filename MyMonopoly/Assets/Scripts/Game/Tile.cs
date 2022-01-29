@@ -31,7 +31,7 @@ public abstract class Tile : MonoBehaviour
         return _id;
     }
 
-    public abstract void Action(MyNetworkPlayer player);
+    public abstract void Action(MyNetworkPlayer player, int tileId = 0);
     #endregion
 
     #region Client

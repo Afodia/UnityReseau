@@ -22,7 +22,8 @@ public class BuyableTile : Tile
     #region Server
     
     [Server]
-    public override void Action(MyNetworkPlayer player)
+
+    public override void Action(MyNetworkPlayer player, int tileId)
     {
         if (ownerId == 0)
             UpgradeTile(player);
