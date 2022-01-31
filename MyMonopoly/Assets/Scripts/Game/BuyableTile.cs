@@ -25,10 +25,12 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        if (ownerId == 0)
+        Debug.Log("action !");
+        if (ownerId == 0 || ownerId == player.GetPlayerId())
             UpgradeTile(player);
         else if (player.GetPlayerId() != ownerId)
             PayRent(player);
+        GameManager.instance.TileActionEnded();
     }
 
     [Server]
@@ -41,13 +43,12 @@ public class BuyableTile : Tile
     [Server]
     private void UpgradeTile(MyNetworkPlayer player)
     {
-        if (player.GetMoney() >= data.upgradePrice[0])
-            player.OfferToUpgrade(data, new Sprite[4] { 
-                houses[player.GetPlayerId() - 1],
-                houses[player.GetPlayerId() + 3],
-                houses[player.GetPlayerId() + 7],
-                houses[player.GetPlayerId() + 11]
-            }, currLvl);
+        int[] toSend = new int[4];
+
+        for (int i = 0 ; i < 4 ; i++)
+            toSend[i] = player.GetPlayerId() - 1 + (i * 4);
+        if (player.GetMoney() >= data.upgradePrice[currLvl])
+            player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
     }
 
     [Server]
@@ -55,20 +56,40 @@ public class BuyableTile : Tile
     {
         currLvl = lvl;
         ownerId = pId;
-        price.text = UIPanel.instance.ChangePriceToText(data.rentPrice[lvl]);
-        house.sprite = houses[pId + (lvl * 4)];
+        UpdateUI();
+        return;
+    }
+
+    [ClientRpc]
+    private void UpdateUI()
+    {
+        price.text = GameManager.instance.ChangePriceToText(data.rentPrice[currLvl]);
+        house.sprite = houses[(ownerId - 1) + (currLvl * 4)];
+        return;
     }
 
     [Server]
     private void PayRent(MyNetworkPlayer player)
     {
         float rent = GetRent();
+
+        player.ChangeMoney(-rent);
+        return;
     }
 
     [Server]
     private float GetRent()
     {
         return data.rentPrice[currLvl] * (System.Convert.ToSingle(isMonopole) + 1f);
+    }
+
+    [Server]
+    public float GetUpgrade(int lvl)
+    {
+        float toBuy = 0;
+        for (int i = currLvl ; i <= lvl ; i++)
+            toBuy += data.upgradePrice[i];
+        return toBuy;
     }
 
     #endregion

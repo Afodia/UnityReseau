@@ -29,6 +29,7 @@ public class NonBuyableTile : Tile
                 StartAction(player);
                 break;
         }
+        GameManager.instance.TileActionEnded();
     }
 
     [Server]

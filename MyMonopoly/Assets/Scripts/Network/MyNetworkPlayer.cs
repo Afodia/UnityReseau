@@ -63,11 +63,6 @@ public class MyNetworkPlayer : NetworkBehaviour
         StartCoroutine(DisplayDicesRolling(resDice1, resDice2));
     }
 
-    public void OfferToUpgrade(TilesData upgradePrice, Sprite[] houses, int lvl)
-    {
-        //if (!hasAuthority)
-        DisplayUpgradeOffer(upgradePrice, houses, lvl);
-    }
 
     #endregion
     #region Client UI
@@ -104,6 +99,8 @@ public class MyNetworkPlayer : NetworkBehaviour
     [TargetRpc]
     public void TargetHideDiceButton()
     {
+        Debug.Log("hide button");
+
         DicesButton.SetActive(false);
     }
 
@@ -149,17 +146,18 @@ public class MyNetworkPlayer : NetworkBehaviour
         launchingDice = true;
     }
 
-    [Client]
-    private void DisplayUpgradeOffer(TilesData price, Sprite[] houses, int lvl)
+    [TargetRpc]
+    public void RpcDisplayUpgradeOffer(TilesData price, int[] houses, int lvl)
     {
-        //UIPanel.instance.ShowPanel(price, houses, lvl, money, connectionToClient.connectionId);
+        Debug.Log("display upgrade");
+        GetComponent<UIPanel>().ShowPanel(price, houses, lvl, money);
     }
 
     [TargetRpc]
     public void UpdateDisplayMoneyOfPlayer(int id, float money)
     {
         TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
-        playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US"))}";
+        playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US")).Replace(',', ' ')}";
     }
 
     [ClientRpc]
@@ -297,15 +295,13 @@ public class MyNetworkPlayer : NetworkBehaviour
             money += amount;
 
         else if (money + amount >= 0)
-            money -= amount;
+            money += amount;
         else {
             amount *= -1;
             amount -= money;
             money = 0;
             MustSell(amount);
         }
-
-//        RpcUpdateDisplayMoneyOfPlayer(this.playerId, this.money);
     }
 
     #endregion

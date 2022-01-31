@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public abstract class Tile : MonoBehaviour
+public abstract class Tile : NetworkBehaviour
 {
     [SerializeField] protected SpriteRenderer over;
     [Header("To change")]

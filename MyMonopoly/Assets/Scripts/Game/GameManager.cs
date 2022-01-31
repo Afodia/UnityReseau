@@ -178,7 +178,11 @@ public class GameManager : NetworkBehaviour
     void OnTileActionPhase()
     {
         Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
+    }
 
+    [Server]
+    public void TileActionEnded()
+    {
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
@@ -186,10 +190,10 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
-        if (NetworkServer.connections.Count <= 1) {
-           currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
-           return;
-        }
+        //if (NetworkServer.connections.Count <= 1) {
+        //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
+        //   return;
+        //}
 
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
         if (nextPlayerId > networkPlayers.Count)
@@ -218,6 +222,27 @@ public class GameManager : NetworkBehaviour
             int playerId = p.GetPlayerId();
             p.RpcSetPlayerAvatarColor(playerId == 1 ? greenColor : playerId == 2 ? blueColor : playerId == 3 ? redColor : playerId == 4 ? purpleColor : Color.white);
         }
+        return;
+    }
+
+    [Server]
+    private void CheckUpgrade(int upgradeLvl)
+    {
+        if (Tiles[currPlayer.GetTile()].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+            float money = tile.GetUpgrade(upgradeLvl);
+            if (currPlayer.GetMoney() >= money) {
+                currPlayer.ChangeMoney(-money);
+                tile.UpdateTile(currPlayer.GetPlayerId(), upgradeLvl);
+                ChangeMoneyDisplayed();
+            }
+
+        }
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpgradeBuilding(int upgradeLvl)
+    {
+        CheckUpgrade(upgradeLvl);
     }
 
     #endregion
@@ -236,11 +261,23 @@ public class GameManager : NetworkBehaviour
         return new Vector3(0, 0, 0);
     }
 
+    [Client]
     public void LaunchDice()
     {
         CmdLaunchDice();
     }
 
+    [Client]
+    public string ChangePriceToText(float price)
+    {
+        string toReturn;
+
+        if (price < 1000000)
+            toReturn = (price / 1000).ToString() + "K";
+        else
+            toReturn = (price / 1000000).ToString() + "M";
+        return toReturn;
+    }
     #endregion
 
 }

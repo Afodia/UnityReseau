@@ -4,59 +4,44 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System;
+using Mirror;
 
-public class UIPanel : MonoBehaviour
+public class UIPanel : NetworkBehaviour
 {
-    public static UIPanel instance;
-    private UIPanel() { }
+    [SerializeField] Sprite[] houses = new Sprite[16];
     [SerializeField] TMP_Text upgradeCity;
     [SerializeField] TMP_Text upgradeRent;
     [SerializeField] TMP_Text upgradeButton;
     [SerializeField] GameObject upgradePanel;
     [SerializeField] GameObject[] upgradePanels;
 
-    public static event Action<int, int> OnPlayerBoughtUpgrade;
-
     int upgradeLevel = 0;
     TilesData currData;
     int currLvl;
 
-    void Awake()
-    {
-        if (instance != null && instance != this)
-            Destroy(gameObject);
-
-        instance = this;
-    }
-    public string ChangePriceToText(float price)
-    { // 1000 -> 1K : 100000 -> 100K : 1000000 -> 1M
-        string toReturn;
-
-        if (price < 1000000)
-            toReturn = (price / 1000).ToString()+ "K";
-        else
-            toReturn = (price / 1000000).ToString() + "M";
-        return toReturn;
-    }
-
     #region UpgradePanel
+
+    [Client]
     public void ChangeUpgradeLvl(int newLevel)
     {
         upgradeLevel = newLevel;
         UpgradeUpdate();
     }
 
-
-    public void ShowPanel(TilesData data, Sprite[] houses, int lvl, float money)
+    [Client]
+    public void ShowPanel(TilesData data, int[] housesId, int lvl, float money)
     {
-        float toBuy = 0;
+        Debug.Log("show panel");
 
+        float toBuy = 0;
+        upgradeLevel = lvl;
         upgradePanel.SetActive(true);
         for (int i = 0 ; i < upgradePanels.Length ; i++) {
-            upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[i];
-            upgradePanels[i].GetComponentInChildren<TMP_Text>().text = ChangePriceToText(data.upgradePrice[i]);
+            upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[housesId[i]];
+            upgradePanels[i].GetComponentInChildren<TMP_Text>().text = GameManager.instance.ChangePriceToText(data.upgradePrice[i]);
             toBuy += data.upgradePrice[i];
             if (i < lvl || toBuy > money) {
+                upgradePanels[i].transform.Find("Selection").gameObject.SetActive(true);
                 upgradePanels[i].GetComponent<Button>().enabled = false;
             }
         }
@@ -65,19 +50,31 @@ public class UIPanel : MonoBehaviour
         upgradeCity.text = data.tileName;
     }
 
+    [Client]
     void UpgradeUpdate()
     {
         float toBuy = 0;
         for (int i = currLvl ; i <= upgradeLevel ; i++)
             toBuy += currData.upgradePrice[i];
-        upgradeRent.text = "Rent rate: " + ChangePriceToText(currData.rentPrice[upgradeLevel]);
-        upgradeButton.text = "Buy For " + ChangePriceToText(toBuy);
+        upgradeRent.text = "Rent rate: " + GameManager.instance.ChangePriceToText(currData.rentPrice[upgradeLevel]);
+        if (toBuy == 0)
+            upgradeButton.text = "No upgrade selected";
+        else
+            upgradeButton.text = "Buy For " + GameManager.instance.ChangePriceToText(toBuy);
     }
 
+    private void ResetUi()
+    {
+        foreach (GameObject up in upgradePanels) {
+            up.transform.Find("Selection").gameObject.SetActive(false);
+        }
+    }
+
+    [Client]
     public void ValidateUpgrade()
     {
-
-        //OnPlayerBoughtUpgrade?.Invoke(currPlayerId, upgradeLevel);
+        ResetUi();
+        GameManager.instance.CmdUpgradeBuilding(upgradeLevel);
     }
     #endregion
 }
