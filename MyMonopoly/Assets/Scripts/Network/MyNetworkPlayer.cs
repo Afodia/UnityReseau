@@ -7,8 +7,8 @@ using TMPro;
 
 public class MyNetworkPlayer : NetworkBehaviour
 {
-    [SerializeField] int playerId = 0;
-    /*[SerializeField]*/ int clientId = 0;
+    int playerId = 0;
+    int clientId = 0;
     float money = 2000000f;
     NetworkConnection conn;
     bool isFirstBoardTurn = true;
@@ -26,6 +26,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SerializeField] GameObject PauseMenu;
     [SerializeField] GameObject WinLoseMenu;
     [SerializeField] TMP_Text WinLoseText;
+    [SerializeField] SellUiPanel SellUiPanelScript;
 
     [Header("UI")]
     [SerializeField] GameObject PlayerAvatar;
@@ -51,7 +52,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     [Server]
     public void MustSell(float needToBePaid)
     {
-
+        this.SellUiPanelScript.TargetShowPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
     }
 
     #endregion

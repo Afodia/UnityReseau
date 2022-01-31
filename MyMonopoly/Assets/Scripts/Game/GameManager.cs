@@ -245,6 +245,32 @@ public class GameManager : NetworkBehaviour
         CheckUpgrade(upgradeLvl);
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdSellTile(int[] tilesIDsToSell)
+    {
+        foreach (int tileID in tilesIDsToSell) {
+            if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+                currPlayer.ChangeMoney(tile.GetSellPrice());
+                tile.SellTile(currPlayer);
+                ChangeMoneyDisplayed();
+            }
+        }
+    }
+
+
+    [Server]
+    public List<BuyableTile> GetPlayerOwnedTiles(int playerId)
+    {
+        List<BuyableTile> ownedTiles = new List<BuyableTile>();
+
+        for (int i = 0; i < Tiles.Length; i++)
+            if (Tiles[i].TryGetComponent<BuyableTile>(out BuyableTile tile))
+                if (tile.GetOwnerId() == playerId)
+                    ownedTiles.Add(tile);
+
+        return ownedTiles;
+    }
+
     #endregion
     #region Client
 

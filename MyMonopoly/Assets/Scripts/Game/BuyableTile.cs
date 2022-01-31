@@ -25,7 +25,7 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        Debug.Log("action !");
+        player.ChangeMoney(-200000);
         if (ownerId == 0 || ownerId == player.GetPlayerId())
             UpgradeTile(player);
         else if (player.GetPlayerId() != ownerId)
@@ -54,18 +54,23 @@ public class BuyableTile : Tile
     [Server]
     public void UpdateTile(int pId, int lvl)
     {
-        currLvl = lvl;
-        ownerId = pId;
-        UpdateUI();
+        this.currLvl = lvl;
+        this.ownerId = pId;
+        // TODO set isMonopole
+        UpdateUI(pId, lvl);
         return;
     }
 
     [ClientRpc]
-    private void UpdateUI()
+    private void UpdateUI(int pId, int lvl)
     {
-        price.text = GameManager.instance.ChangePriceToText(data.rentPrice[currLvl]);
-        house.sprite = houses[(ownerId - 1) + (currLvl * 4)];
-        return;
+        if (pId == 0) {
+            price.text = "";
+            house.sprite = null;
+        } else {
+            price.text = GameManager.instance.ChangePriceToText(data.rentPrice[lvl]);
+            house.sprite = houses[(pId - 1) + (lvl * 4)];
+        }
     }
 
     [Server]
@@ -92,6 +97,37 @@ public class BuyableTile : Tile
         return toBuy;
     }
 
+    [Server]
+    public int GetOwnerId()
+    {
+        return this.ownerId;
+    }
+
+    [Server]
+    public override Vector3 GetPlayerPosition(int playerId)
+    {
+        return playerPos[playerId - 1].transform.position;
+    }
+
+    [Server]
+    public string GetTileName()
+    {
+        return this.data.tileName;
+    }
+
+    [Server]
+    public float GetSellPrice()
+    {
+        return this.data.sellPrice[currLvl];
+    }
+
+    [Server]
+    public void SellTile(MyNetworkPlayer currentPlayer)
+    {
+        currentPlayer.ChangeMoney(GetSellPrice());
+        UpdateTile(0, 0);
+    }
+
     #endregion
 
     #region Client
@@ -103,11 +139,6 @@ public class BuyableTile : Tile
         price.text = "";
         if (overlay && over)
             over.sprite = overlay;
-    }
-
-    public override Vector3 GetPlayerPosition(int playerId)
-    {
-        return playerPos[playerId - 1].transform.position;
     }
 
     #endregion
