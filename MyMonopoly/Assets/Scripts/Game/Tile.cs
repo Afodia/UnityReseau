@@ -24,20 +24,33 @@ public abstract class Tile : NetworkBehaviour
     };
 
     #region Server
+
     [Server]
     public int GetId()
     {
-        Debug.Log($"id : {_id}");
         return _id;
     }
 
     public abstract void Action(MyNetworkPlayer player, int tileId = 0);
-    #endregion
 
+    #endregion
     #region Client
+
     void Start() { }
 
     public abstract Vector3 GetPlayerPosition(int playerId);
+
+    [Client]
+    public int ClientGetId()
+    {
+        return _id;
+    }
+
+    [TargetRpc]
+    public void RpcSetId(int id)
+    {
+        this._id = id;
+    }
 
     #endregion
 }

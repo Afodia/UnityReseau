@@ -57,6 +57,7 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// </summary>
     /// <param name="conn">The connection that disconnected.</param>
     public override void OnRoomServerDisconnect(NetworkConnection conn) {
+        GameManager.instance.OnPlayerDisconnected(conn);
     }
 
     /// <summary>
@@ -112,8 +113,6 @@ public class MyNetworkRoomManager : NetworkRoomManager
         MyNetworkRoomPlayer myRoomPlayer = roomPlayer.GetComponent<MyNetworkRoomPlayer>();
         MyNetworkPlayer networkPlayer = gamePlayer.GetComponent<MyNetworkPlayer>();
         networkPlayer.SetClientId(myRoomPlayer.index);
-        //networkPlayer.SetPlayerId(myRoomPlayer.index + 1);
-        //Debug.Log(networkPlayer.GetPlayerId());
         networkPlayer.SetConn(conn);
         players.Add(networkPlayer);
 

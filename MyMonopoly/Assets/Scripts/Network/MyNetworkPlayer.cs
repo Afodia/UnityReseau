@@ -9,8 +9,8 @@ public class MyNetworkPlayer : NetworkBehaviour
 {
     int playerId = 0;
     int clientId = 0;
-    float money = 2000000f;
     NetworkConnection conn;
+    float money = 2000000f;
     bool isFirstBoardTurn = true;
     int nbMonopolies = 0;
     int currTile = 0;
@@ -26,7 +26,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     [SerializeField] GameObject PauseMenu;
     [SerializeField] GameObject WinLoseMenu;
     [SerializeField] TMP_Text WinLoseText;
-    [SerializeField] SellUiPanel SellUiPanelScript;
 
     [Header("UI")]
     [SerializeField] GameObject PlayerAvatar;
@@ -48,11 +47,23 @@ public class MyNetworkPlayer : NetworkBehaviour
            PauseMenu.SetActive(!PauseMenu.activeSelf);
     }
 
-
     [Server]
     public void MustSell(float needToBePaid)
     {
-        this.SellUiPanelScript.TargetShowPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
+        float ownedTilesSellValue = GameManager.instance.GetTotalSellValueOfPlayerOwnedTiles(this.playerId);
+
+        if (this.money + ownedTilesSellValue < needToBePaid) {
+            GameManager.instance.SellAllOwnedTilesOfPlayer(this);
+            TargetPlayerLose(this.playerId,
+            "you don't have enought money to pay what you owe\n" +
+            $"You had $ {this.money} on your pocket\n" +
+            $"Your cities sell value was $ {ownedTilesSellValue}\n" +
+            $"And you owed $ {needToBePaid}");
+            GameManager.instance.OnPlayerLose();
+            return;
+        }
+
+        GetComponent<UIPanel>().TargetShowSellPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
     }
 
     #endregion
@@ -67,6 +78,7 @@ public class MyNetworkPlayer : NetworkBehaviour
 
     #endregion
     #region Client UI
+
     [TargetRpc]
     public void TargetSetPlayersUi(int nbPlayers)
     {
@@ -151,7 +163,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     public void RpcDisplayUpgradeOffer(TilesData price, int[] houses, int lvl)
     {
         Debug.Log("display upgrade");
-        GetComponent<UIPanel>().ShowPanel(price, houses, lvl, money);
+        GetComponent<UIPanel>().ShowUpgradePanel(price, houses, lvl, money);
     }
 
     [TargetRpc]
@@ -192,7 +204,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         this.playerId = id;
     }
-    
+
     [TargetRpc]
     public void TargetSetPlayerId(int id)
     {
@@ -277,10 +289,22 @@ public class MyNetworkPlayer : NetworkBehaviour
         return this.money;
     }
 
+    [Server]
+    public void SetMoney(float value)
+    {
+        this.money = value;
+    }
+
     [ClientRpc]
     public void RpcSetPlayerAvatarPosition(Vector3 newPosition)
     {
         PlayerAvatar.transform.position = new Vector3(newPosition.x, newPosition.y, 0);
+    }
+
+    [ClientRpc]
+    public void DisablePlayerAvatar()
+    {
+        PlayerAvatar.SetActive(false);
     }
 
     [ClientRpc]

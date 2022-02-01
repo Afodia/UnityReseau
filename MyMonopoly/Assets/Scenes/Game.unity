@@ -1322,6 +1322,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Luck2
       objectReference: {fileID: 0}
+    - target: {fileID: 3124437743326852870, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: sceneId
+      value: 2029244639
+      objectReference: {fileID: 0}
     - target: {fileID: 3249120997833740592, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.6
@@ -1401,6 +1405,34 @@ PrefabInstance:
     - target: {fileID: 7302268812865127554, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_LocalPosition.y
       value: -0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.96186554
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.27352276
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.292
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.227
+      objectReference: {fileID: 0}
+    - target: {fileID: 9074479054813177827, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -31.748
       objectReference: {fileID: 0}
     - target: {fileID: 9145280715457722806, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_FlipX
@@ -2886,6 +2918,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Taxes
       objectReference: {fileID: 0}
+    - target: {fileID: 3124437743326852870, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: sceneId
+      value: 1862913797
+      objectReference: {fileID: 0}
     - target: {fileID: 3279258558257770431, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -3623,6 +3659,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Luck1
       objectReference: {fileID: 0}
+    - target: {fileID: 3124437743326852870, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: sceneId
+      value: 1961906286
+      objectReference: {fileID: 0}
     - target: {fileID: 3279258558257770431, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_RootOrder
       value: 10
@@ -3983,6 +4023,10 @@ PrefabInstance:
     - target: {fileID: 2351370936609387684, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_Name
       value: Luck3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3124437743326852870, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
+      propertyPath: sceneId
+      value: 3759730669
       objectReference: {fileID: 0}
     - target: {fileID: 3279258558257770431, guid: 483dcbc0d0f88384f9c1685fe9e27b75, type: 3}
       propertyPath: m_RootOrder

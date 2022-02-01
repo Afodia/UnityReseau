@@ -57,9 +57,23 @@ public class GameManager : NetworkBehaviour
             networkPlayers[i].TargetSetPlayerId(i + 1);
         }
         currPlayer = networkPlayers[rand];
+
+        ClientTilesStartGameSetup();
         SetPlayersUI();
+
         currPhase = Phase.LaunchDice;
         PhaseChange();
+    }
+
+    [Server]
+    void ClientTilesStartGameSetup()
+    {
+        foreach (GameObject tile in Tiles) {
+            tile.GetComponent<Tile>().RpcSetId(tile.GetComponent<Tile>().GetId());
+            if (tile.TryGetComponent<BuyableTile>(out BuyableTile buyableTile)) {
+                buyableTile.RpcSetData(buyableTile.GetData());
+            }
+        }
     }
 
     [Server]
@@ -183,6 +197,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void TileActionEnded()
     {
+        Debug.Log("TileActionEnded");
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
@@ -246,7 +261,7 @@ public class GameManager : NetworkBehaviour
     }
 
     [Command(requiresAuthority = false)]
-    public void CmdSellTile(int[] tilesIDsToSell)
+    public void CmdSellTiles(int[] tilesIDsToSell)
     {
         foreach (int tileID in tilesIDsToSell) {
             if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
@@ -264,11 +279,63 @@ public class GameManager : NetworkBehaviour
         List<BuyableTile> ownedTiles = new List<BuyableTile>();
 
         for (int i = 0; i < Tiles.Length; i++)
-            if (Tiles[i].TryGetComponent<BuyableTile>(out BuyableTile tile))
-                if (tile.GetOwnerId() == playerId)
-                    ownedTiles.Add(tile);
+            if (Tiles[i].TryGetComponent<BuyableTile>(out BuyableTile tile) && tile.GetOwnerId() == playerId)
+                ownedTiles.Add(tile);
 
         return ownedTiles;
+    }
+
+    [Server]
+    public float GetTotalSellValueOfPlayerOwnedTiles(int playerId)
+    {
+        float totalSellValue = 0;
+
+        for (int i = 0; i < Tiles.Length; i++)
+            if (Tiles[i].TryGetComponent<BuyableTile>(out BuyableTile tile) && tile.GetOwnerId() == playerId)
+                totalSellValue += tile.GetSellPrice();
+
+        return totalSellValue;
+    }
+
+    [Server]
+    public void SellAllOwnedTilesOfPlayer(MyNetworkPlayer player)
+    {
+        List<BuyableTile> ownedTiles = GetPlayerOwnedTiles(player.GetPlayerId());
+
+        foreach (BuyableTile tile in ownedTiles)
+            tile.SellTile(player);
+
+        player.SetMoney(0f);
+        ChangeMoneyDisplayed();
+    }
+
+    [Server]
+    public void OnPlayerLose()
+    {
+        currPlayer.DisablePlayerAvatar();
+
+        currPhase = Phase.NextTurn;
+        PhaseChange();
+    }
+
+    [Server]
+    public void OnPlayerDisconnected(NetworkConnection conn)
+    {
+        MyNetworkPlayer disconnectedPlayer = null;
+        foreach (MyNetworkPlayer p in networkPlayers)
+            if (p.GetConn() == conn) {
+                disconnectedPlayer = p;
+                break;
+            }
+
+        SellAllOwnedTilesOfPlayer(disconnectedPlayer);
+        networkPlayers.Remove(disconnectedPlayer);
+
+        if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1) {
+                networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
+            return;
+        }
+
     }
 
     #endregion
@@ -304,6 +371,7 @@ public class GameManager : NetworkBehaviour
             toReturn = (price / 1000000).ToString() + "M";
         return toReturn;
     }
+
     #endregion
 
 }

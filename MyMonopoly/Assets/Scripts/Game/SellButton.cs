@@ -7,17 +7,17 @@ using TMPro;
 
 public class SellButton : MonoBehaviour
 {
-    public static event Action OnCityButtonClicked;
     int tileId = -1;
     float sellPrice = 0f;
     [SerializeField] TMP_Text cityNameAndSellValueText;
-
     bool selected = false;
     [SerializeField] Color notSelectedColor;
     [SerializeField] Color selectedColor;
+    UIPanel uiPanelRef;
 
-    public void SetButtonsInformations(int tileId, string cityName, float sellPrice)
+    public void SetButtonsInformations(UIPanel uiPanel, int tileId, string cityName, float sellPrice)
     {
+        this.uiPanelRef = uiPanel;
         this.tileId = tileId;
         this.sellPrice = sellPrice;
         this.gameObject.SetActive(true);
@@ -43,7 +43,7 @@ public class SellButton : MonoBehaviour
     {
         selected = !selected;
         GetComponent<Image>().color = this.selected ? selectedColor : notSelectedColor;
-        OnCityButtonClicked?.Invoke();
+        this.uiPanelRef.UpdateSellValueText();
     }
 
     public bool isSelected()

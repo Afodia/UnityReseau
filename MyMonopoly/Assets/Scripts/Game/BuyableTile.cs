@@ -25,7 +25,7 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        player.ChangeMoney(-200000);
+        player.ChangeMoney(-500000);
         if (ownerId == 0 || ownerId == player.GetPlayerId())
             UpgradeTile(player);
         else if (player.GetPlayerId() != ownerId)
@@ -79,7 +79,18 @@ public class BuyableTile : Tile
         float rent = GetRent();
 
         player.ChangeMoney(-rent);
-        return;
+    }
+
+    [Server]
+    public TilesData GetData()
+    {
+        return this.data;
+    }
+
+    [TargetRpc]
+    public void RpcSetData(TilesData data)
+    {
+        this.data = data;
     }
 
     [Server]
@@ -131,6 +142,19 @@ public class BuyableTile : Tile
     #endregion
 
     #region Client
+
+    [Client]
+    public string ClientGetTileName()
+    {
+        return this.data.tileName;
+    }
+
+    [Client]
+    public float ClientGetSellPrice()
+    {
+        return this.data.sellPrice[currLvl];
+    }
+
 
     private void Start()
     {
