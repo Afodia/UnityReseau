@@ -9,6 +9,7 @@ public class GameManager : NetworkBehaviour
 {
     [SerializeField] GameObject playerPrefab;
     [SerializeField] GameObject[] Tiles;
+    [SerializeField] List<MonopoliesLine> MonopoliesLines;
     public static GameManager instance;
     private GameManager() { }
 
@@ -37,7 +38,20 @@ public class GameManager : NetworkBehaviour
     bool playAgain = false;
     int diceResult = 0;
 
+    bool previousActionFinished = true;
+
+
     #region Server
+
+    [Server]
+    public MyNetworkPlayer GetPlayer(int playerId)
+    {
+        foreach (MyNetworkPlayer player in networkPlayers)
+            if (player.GetPlayerId() == playerId)
+                return player;
+
+        return null;
+    }
 
     [Server]
     public void StartGame(List<MyNetworkPlayer> players)
@@ -98,12 +112,6 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    [Command(requiresAuthority = false)]
-    void CmdLaunchDice()
-    {
-        RollDices();
-    }
-
     [Server]
     void OnLaunchDicePhase()
     {
@@ -153,6 +161,8 @@ public class GameManager : NetworkBehaviour
         currPlayer.RpcHideDices();
 
         if (nbDouble >= 3 || currPlayer.isInJail()) {
+            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+            this.previousActionFinished = false;
             Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
             currPhase = Phase.NextTurn;
@@ -168,29 +178,27 @@ public class GameManager : NetworkBehaviour
         int newPos = currPlayer.GetTile() + diceResult;
 
         if (newPos > Tiles.Length - 1) {
-            Tiles[0].GetComponent<Tile>().Action(currPlayer);
+            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+            this.previousActionFinished = false;
+            Tiles[0].GetComponent<Tile>().Action(currPlayer, 0);
             ChangeMoneyDisplayed();
             newPos %= (Tiles.Length - 1);
         }
         currPlayer.SetTile(newPos);
         currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos, currPlayer.GetPlayerId()));
 
+        StartCoroutine(MyWaitForSeconds(1f));
+
         currPhase = Phase.TileAction;
         PhaseChange();
     }
 
     [Server]
-    private void ChangeMoneyDisplayed()
-    {
-        foreach (MyNetworkPlayer p in networkPlayers) {
-            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
-        }
-        return;
-    }
-    
-    [Server]
     void OnTileActionPhase()
     {
+        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+        this.previousActionFinished = false;
+
         Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
     }
 
@@ -198,6 +206,8 @@ public class GameManager : NetworkBehaviour
     public void TileActionEnded()
     {
         Debug.Log("TileActionEnded");
+        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to true");
+        this.previousActionFinished = true;
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
@@ -205,10 +215,22 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
-        //if (NetworkServer.connections.Count <= 1) {
+        // if (NetworkServer.connections.Count <= 1) {
         //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
         //   return;
-        //}
+        // }
+
+        CheckAndUpdateMonopoliesStates();
+        if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you own all the beaches !");
+            return;
+        } else if (GetPlayerNbMonopolies(currPlayer.GetPlayerId()) >= 3) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have 3 monopolies !");
+            return;
+        } else if (PlayerHasMonopolyLine(currPlayer.GetPlayerId())) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have a monopolies line !");
+            return;
+        }
 
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
         if (nextPlayerId > networkPlayers.Count)
@@ -244,20 +266,16 @@ public class GameManager : NetworkBehaviour
     private void CheckUpgrade(int upgradeLvl)
     {
         if (Tiles[currPlayer.GetTile()].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+            Debug.Log($"currPlayer id: {currPlayer.GetPlayerId()}");
             float money = tile.GetUpgrade(upgradeLvl);
             if (currPlayer.GetMoney() >= money) {
                 currPlayer.ChangeMoney(-money);
                 tile.UpdateTile(currPlayer.GetPlayerId(), upgradeLvl);
-                ChangeMoneyDisplayed();
             }
-
         }
-    }
 
-    [Command(requiresAuthority = false)]
-    public void CmdUpgradeBuilding(int upgradeLvl)
-    {
-        CheckUpgrade(upgradeLvl);
+        ChangeMoneyDisplayed();
+        TileActionEnded();
     }
 
     [Server]
@@ -273,26 +291,9 @@ public class GameManager : NetworkBehaviour
             currPlayer.SetTile((int)card.value);
             currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
         }
-    }
 
-    [Command(requiresAuthority = false)]
-    public void CmdCardTaken(CardsData card)
-    {
-        CardTaken(card);
+        TileActionEnded();
     }
-
-    [Command(requiresAuthority = false)]
-    public void CmdSellTiles(int[] tilesIDsToSell)
-    {
-        foreach (int tileID in tilesIDsToSell) {
-            if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
-                currPlayer.ChangeMoney(tile.GetSellPrice());
-                tile.SellTile(currPlayer);
-                ChangeMoneyDisplayed();
-            }
-        }
-    }
-
 
     [Server]
     public List<BuyableTile> GetPlayerOwnedTiles(int playerId)
@@ -334,15 +335,15 @@ public class GameManager : NetworkBehaviour
     public void OnPlayerLose()
     {
         currPlayer.DisablePlayerAvatar();
-
-        currPhase = Phase.NextTurn;
-        PhaseChange();
+        playAgain = false;
+        TileActionEnded();
     }
 
     [Server]
     public void OnPlayerDisconnected(NetworkConnection conn)
     {
         MyNetworkPlayer disconnectedPlayer = null;
+
         foreach (MyNetworkPlayer p in networkPlayers)
             if (p.GetConn() == conn) {
                 disconnectedPlayer = p;
@@ -352,16 +353,94 @@ public class GameManager : NetworkBehaviour
         SellAllOwnedTilesOfPlayer(disconnectedPlayer);
         networkPlayers.Remove(disconnectedPlayer);
 
-        if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1) {
-                networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
-            return;
-        }
+        if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1)
+            networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
+    }
 
+    [Server]
+    public void CheckAndUpdateMonopoliesStates()
+    {
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+                if (monopoly.IsMonopoly())
+                    foreach (BuyableTile tile in monopoly.tiles)
+                        tile.SetMonopoly(true);
+    }
+
+    [Server]
+    public int GetPlayerNbMonopolies(int playerId)
+    {
+        int nbMonopolies = 0;
+
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+                if (monopoly.IsMonopoly() && monopoly.GetMonopolyOwnerId() == playerId)
+                    nbMonopolies++;
+
+        return nbMonopolies;
+    }
+
+    [Server]
+    public bool PlayerHasMonopolyLine(int playerId)
+    {
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            if (monopoliesLine.IsLinearMonopoly() && monopoliesLine.GetMonopoliesLineOwnerId() == playerId)
+                return true;
+
+        return false;
     }
 
     #endregion
+
+
+
     #region Client
 
+    [Client]
+    public void LaunchDice()
+    {
+        CmdLaunchDice();
+    }
+
+    [Command(requiresAuthority = false)]
+    void CmdLaunchDice()
+    {
+        RollDices();
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpgradeBuilding(int upgradeLvl)
+    {
+        CheckUpgrade(upgradeLvl);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdCardTaken(CardsData card)
+    {
+        CardTaken(card);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSellTiles(int[] tilesIDsToSell)
+    {
+        foreach (int tileID in tilesIDsToSell) {
+            if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+                currPlayer.ChangeMoney(tile.GetSellPrice());
+                tile.SellTile(currPlayer);
+            }
+        }
+
+        ChangeMoneyDisplayed();
+        TileActionEnded();
+    }
+
+    #endregion
+
+
+
+    #region Utils
+
+    [Server]
     public Vector3 GetTilePosition(int tileId, int playerId)
     {
         Tiles[tileId].TryGetComponent<BuyableTile>(out BuyableTile buyableTile);
@@ -376,12 +455,6 @@ public class GameManager : NetworkBehaviour
     }
 
     [Client]
-    public void LaunchDice()
-    {
-        CmdLaunchDice();
-    }
-
-    [Client]
     public string ChangePriceToText(float price)
     {
         string toReturn;
@@ -391,6 +464,19 @@ public class GameManager : NetworkBehaviour
         else
             toReturn = (price / 1000000).ToString() + "M";
         return toReturn;
+    }
+
+        [Server]
+    public void ChangeMoneyDisplayed()
+    {
+        foreach (MyNetworkPlayer p in networkPlayers) {
+            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
+        }
+    }
+
+    IEnumerator MyWaitForSeconds(float time)
+    {
+        yield return new WaitForSeconds(time);
     }
 
     #endregion

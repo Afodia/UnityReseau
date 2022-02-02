@@ -15,7 +15,7 @@ public class BuyableTile : Tile
     [SerializeField] GameObject[] playerPos;
     [SerializeField] Sprite[] houses = new Sprite[16];
 
-    private bool isMonopole = false;
+    private bool isMonopoly = false;
     private int ownerId = 0;
     private int currLvl = 0;
 
@@ -25,26 +25,24 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        player.ChangeMoney(-500000);
-        if (type == Type.Train) {
+        if (type == Type.Train)
             TrainTile();
-        } else {
+        else {
             if (ownerId == 0 || ownerId == player.GetPlayerId())
                 UpgradeTile(player);
             else if (player.GetPlayerId() != ownerId)
                 PayRent(player);
         }
-        GameManager.instance.TileActionEnded();
     }
 
     [Server]
     private void TrainTile()
     {
-
+        GameManager.instance.TileActionEnded();
     }
 
     [Server]
-    private void BuyTile(MyNetworkPlayer player)
+    private void BuyTile(MyNetworkPlayer player) // Pupose is to buy tile of another player
     {
         if (ownerId != 0)
             return;
@@ -57,6 +55,7 @@ public class BuyableTile : Tile
 
         for (int i = 0 ; i < 4 ; i++)
             toSend[i] = player.GetPlayerId() - 1 + (i * 4);
+
         if (player.GetMoney() >= data.upgradePrice[currLvl])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
     }
@@ -66,7 +65,6 @@ public class BuyableTile : Tile
     {
         this.currLvl = lvl;
         this.ownerId = pId;
-        // TODO set isMonopole
         UpdateUI(pId, lvl);
         return;
     }
@@ -78,7 +76,7 @@ public class BuyableTile : Tile
             price.text = "";
             house.sprite = null;
         } else {
-            price.text = GameManager.instance.ChangePriceToText(data.rentPrice[lvl]);
+            price.text = GameManager.instance.ChangePriceToText(data.rentPrice[lvl] * (System.Convert.ToSingle(isMonopoly) + 1f));
             house.sprite = houses[(pId - 1) + (lvl * 4)];
         }
     }
@@ -89,6 +87,8 @@ public class BuyableTile : Tile
         float rent = GetRent();
 
         player.ChangeMoney(-rent);
+        GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);
+        GameManager.instance.TileActionEnded();
     }
 
     [Server]
@@ -97,7 +97,7 @@ public class BuyableTile : Tile
         return this.data;
     }
 
-    [TargetRpc]
+    [ClientRpc]
     public void RpcSetData(TilesData data)
     {
         this.data = data;
@@ -106,7 +106,7 @@ public class BuyableTile : Tile
     [Server]
     private float GetRent()
     {
-        return data.rentPrice[currLvl] * (System.Convert.ToSingle(isMonopole) + 1f);
+        return data.rentPrice[currLvl] * (System.Convert.ToSingle(isMonopoly) + 1f);
     }
 
     [Server]
@@ -122,6 +122,12 @@ public class BuyableTile : Tile
     public int GetOwnerId()
     {
         return this.ownerId;
+    }
+
+    [Server]
+    public int GetTileLevel()
+    {
+        return this.currLvl;
     }
 
     [Server]
@@ -147,6 +153,19 @@ public class BuyableTile : Tile
     {
         currentPlayer.ChangeMoney(GetSellPrice());
         UpdateTile(0, 0);
+    }
+
+    [Server]
+    public void SetMonopoly(bool state)
+    {
+        this.isMonopoly = state;
+        UpdateTile(this.ownerId, this.currLvl);
+    }
+
+    [Server]
+    public bool IsMonopoly()
+    {
+        return this.isMonopoly;
     }
 
     #endregion

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcc3075eda6d4414bace9dd9825c011a, type: 3}
-  m_Name: TileSidney
+  m_Name: TileSydney
   m_EditorClassIdentifier: 
-  tileName: Sidney
+  tileName: Sydney
   upgradePrice:
   - 240000
   - 150000
