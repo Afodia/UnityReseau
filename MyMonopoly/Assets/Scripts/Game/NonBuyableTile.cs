@@ -6,6 +6,7 @@ using Mirror;
 public class NonBuyableTile : Tile
 {
     [SerializeField] GameObject[] playerPos;
+    [SerializeField] CardsData[] luckCards;
 
     #region Server
 
@@ -46,7 +47,11 @@ public class NonBuyableTile : Tile
 
     [Server]
     private void LuckAction(MyNetworkPlayer player)
-    { }
+    {
+        int rand = Random.Range(0, luckCards.Length);
+
+        player.RpcDisplayLuckCards(luckCards[rand]);
+    }
 
     [Server]
     private void SquareAction(MyNetworkPlayer player)
