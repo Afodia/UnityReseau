@@ -18,12 +18,9 @@ public class Monopoly
             return false;
 
         foreach (BuyableTile tile in this.tiles)
-            if (tile.GetOwnerId() != ownerId) {
-                Debug.Log("Isn't a monopoly");
+            if (tile.GetOwnerId() != ownerId)
                 return false;
-            }
 
-        Debug.Log("Is a monopoly");
         return true;
     }
 

@@ -15,12 +15,9 @@ public class MonopoliesLine
 
         int ownerId = this.monopolies[0].tiles[0].GetOwnerId();
         foreach (Monopoly monopoly in this.monopolies)
-            if (!monopoly.IsMonopoly() || monopoly.GetMonopolyOwnerId() != ownerId) {
-                Debug.Log("Isn't a linear monopoly");
+            if (!monopoly.IsMonopoly() || monopoly.GetMonopolyOwnerId() != ownerId)
                 return false;
-            }
 
-        Debug.Log("Is a linear monopoly");
         return true;
     }
 

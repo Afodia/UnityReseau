@@ -27,10 +27,9 @@ public class NonBuyableTile : Tile
                 SquareAction(player);
                 break;
             case Type.Start:
-                StartAction(player);
+                StartAction(player, tileId);
                 break;
         }
-        GameManager.instance.TileActionEnded();
     }
 
     [Server]
@@ -39,32 +38,41 @@ public class NonBuyableTile : Tile
         player.SetInJail(true);
         player.SetTile(tileId);
         player.RpcSetPlayerAvatarPosition(GameManager.instance.GetTilePosition(tileId, player.GetPlayerId()));
+        GameManager.instance.TileActionEnded();
+
     }
 
     [Server]
     private void JailAction(MyNetworkPlayer player)
-    { }
+    {
+        GameManager.instance.TileActionEnded();
+    }
 
     [Server]
     private void LuckAction(MyNetworkPlayer player)
     {
-        int rand = Random.Range(0, luckCards.Length);
+        // int rand = Random.Range(0, luckCards.Length);
 
-        player.RpcDisplayLuckCards(luckCards[rand]);
+        // player.RpcDisplayLuckCards(luckCards[rand]);
+        GameManager.instance.TileActionEnded();
     }
 
     [Server]
     private void SquareAction(MyNetworkPlayer player)
-    { }
+    {
+        GameManager.instance.TileActionEnded();
+    }
 
     [Server]
-    private void StartAction(MyNetworkPlayer player)
+    private void StartAction(MyNetworkPlayer player, int shouldCallTileEndAction)
     {
         if (player.GetIsFirstBoardTurn())
             player.SetIsFirstBoardTurn(false);
 
         player.ChangeMoney(300000);
-        // player.RpcUpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
+
+        if (shouldCallTileEndAction != 0)
+            GameManager.instance.TileActionEnded();
     }
 
     #endregion

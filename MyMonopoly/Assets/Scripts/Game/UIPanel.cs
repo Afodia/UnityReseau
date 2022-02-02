@@ -88,8 +88,9 @@ public class UIPanel : NetworkBehaviour
             upgradeButton.text = "Buy For " + GameManager.instance.ChangePriceToText(toBuy);
     }
 
-    private void ResetUi()
+    private void ResetBuyUi()
     {
+        upgradePanel.SetActive(false);
         foreach (GameObject up in upgradePanels) {
             up.transform.Find("Selection").gameObject.SetActive(false);
         }
@@ -98,8 +99,15 @@ public class UIPanel : NetworkBehaviour
     [Client]
     public void ValidateUpgrade()
     {
-        ResetUi();
+        ResetBuyUi();
         GameManager.instance.CmdUpgradeBuilding(upgradeLevel);
+    }
+
+    [Client]
+    public void CancelBuy()
+    {
+        ResetBuyUi();
+        GameManager.instance.TileActionEnded();
     }
     #endregion
 

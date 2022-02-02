@@ -60,10 +60,8 @@ public class MyNetworkPlayer : NetworkBehaviour
             $"Your cities sell value was $ {ownedTilesSellValue}\n" +
             $"And you owed $ {needToBePaid}");
             GameManager.instance.OnPlayerLose();
-            return;
-        }
-
-        GetComponent<UIPanel>().TargetShowSellPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
+        } else
+            GetComponent<UIPanel>().TargetShowSellPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
     }
 
     #endregion
@@ -323,7 +321,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
         if (amount > 0)
             money += amount;
-
         else if (money + amount >= 0)
             money += amount;
         else {

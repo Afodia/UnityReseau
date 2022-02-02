@@ -38,7 +38,20 @@ public class GameManager : NetworkBehaviour
     bool playAgain = false;
     int diceResult = 0;
 
+    bool previousActionFinished = true;
+
+
     #region Server
+
+    [Server]
+    public MyNetworkPlayer GetPlayer(int playerId)
+    {
+        foreach (MyNetworkPlayer player in networkPlayers)
+            if (player.GetPlayerId() == playerId)
+                return player;
+
+        return null;
+    }
 
     [Server]
     public void StartGame(List<MyNetworkPlayer> players)
@@ -148,6 +161,8 @@ public class GameManager : NetworkBehaviour
         currPlayer.RpcHideDices();
 
         if (nbDouble >= 3 || currPlayer.isInJail()) {
+            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+            this.previousActionFinished = false;
             Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
             currPhase = Phase.NextTurn;
@@ -163,29 +178,27 @@ public class GameManager : NetworkBehaviour
         int newPos = currPlayer.GetTile() + diceResult;
 
         if (newPos > Tiles.Length - 1) {
-            Tiles[0].GetComponent<Tile>().Action(currPlayer);
+            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+            this.previousActionFinished = false;
+            Tiles[0].GetComponent<Tile>().Action(currPlayer, 0);
             ChangeMoneyDisplayed();
             newPos %= (Tiles.Length - 1);
         }
         currPlayer.SetTile(newPos);
         currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos, currPlayer.GetPlayerId()));
 
+        StartCoroutine(MyWaitForSeconds(1f));
+
         currPhase = Phase.TileAction;
         PhaseChange();
     }
 
     [Server]
-    private void ChangeMoneyDisplayed()
-    {
-        foreach (MyNetworkPlayer p in networkPlayers) {
-            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
-        }
-        return;
-    }
-    
-    [Server]
     void OnTileActionPhase()
     {
+        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
+        this.previousActionFinished = false;
+
         Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
     }
 
@@ -193,6 +206,8 @@ public class GameManager : NetworkBehaviour
     public void TileActionEnded()
     {
         Debug.Log("TileActionEnded");
+        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to true");
+        this.previousActionFinished = true;
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
@@ -251,13 +266,16 @@ public class GameManager : NetworkBehaviour
     private void CheckUpgrade(int upgradeLvl)
     {
         if (Tiles[currPlayer.GetTile()].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+            Debug.Log($"currPlayer id: {currPlayer.GetPlayerId()}");
             float money = tile.GetUpgrade(upgradeLvl);
             if (currPlayer.GetMoney() >= money) {
                 currPlayer.ChangeMoney(-money);
                 tile.UpdateTile(currPlayer.GetPlayerId(), upgradeLvl);
-                ChangeMoneyDisplayed();
             }
         }
+
+        ChangeMoneyDisplayed();
+        TileActionEnded();
     }
 
     [Server]
@@ -273,6 +291,8 @@ public class GameManager : NetworkBehaviour
             currPlayer.SetTile((int)card.value);
             currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
         }
+
+        TileActionEnded();
     }
 
     [Server]
@@ -315,15 +335,15 @@ public class GameManager : NetworkBehaviour
     public void OnPlayerLose()
     {
         currPlayer.DisablePlayerAvatar();
-
-        currPhase = Phase.NextTurn;
-        PhaseChange();
+        playAgain = false;
+        TileActionEnded();
     }
 
     [Server]
     public void OnPlayerDisconnected(NetworkConnection conn)
     {
         MyNetworkPlayer disconnectedPlayer = null;
+
         foreach (MyNetworkPlayer p in networkPlayers)
             if (p.GetConn() == conn) {
                 disconnectedPlayer = p;
@@ -333,11 +353,8 @@ public class GameManager : NetworkBehaviour
         SellAllOwnedTilesOfPlayer(disconnectedPlayer);
         networkPlayers.Remove(disconnectedPlayer);
 
-        if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1) {
-                networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
-            return;
-        }
-
+        if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1)
+            networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
     }
 
     [Server]
@@ -374,20 +391,10 @@ public class GameManager : NetworkBehaviour
     }
 
     #endregion
+
+
+
     #region Client
-
-    public Vector3 GetTilePosition(int tileId, int playerId)
-    {
-        Tiles[tileId].TryGetComponent<BuyableTile>(out BuyableTile buyableTile);
-        if (buyableTile != null)
-            return buyableTile.GetPlayerPosition(playerId);
-
-        Tiles[tileId].TryGetComponent<NonBuyableTile>(out NonBuyableTile nonBuyableTile);
-        if (nonBuyableTile != null)
-            return nonBuyableTile.GetPlayerPosition(playerId);
-
-        return new Vector3(0, 0, 0);
-    }
 
     [Client]
     public void LaunchDice()
@@ -399,18 +406,6 @@ public class GameManager : NetworkBehaviour
     void CmdLaunchDice()
     {
         RollDices();
-    }
-
-    [Client]
-    public string ChangePriceToText(float price)
-    {
-        string toReturn;
-
-        if (price < 1000000)
-            toReturn = (price / 1000).ToString() + "K";
-        else
-            toReturn = (price / 1000000).ToString() + "M";
-        return toReturn;
     }
 
     [Command(requiresAuthority = false)]
@@ -432,9 +427,56 @@ public class GameManager : NetworkBehaviour
             if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
                 currPlayer.ChangeMoney(tile.GetSellPrice());
                 tile.SellTile(currPlayer);
-                ChangeMoneyDisplayed();
             }
         }
+
+        ChangeMoneyDisplayed();
+        TileActionEnded();
+    }
+
+    #endregion
+
+
+
+    #region Utils
+
+    [Server]
+    public Vector3 GetTilePosition(int tileId, int playerId)
+    {
+        Tiles[tileId].TryGetComponent<BuyableTile>(out BuyableTile buyableTile);
+        if (buyableTile != null)
+            return buyableTile.GetPlayerPosition(playerId);
+
+        Tiles[tileId].TryGetComponent<NonBuyableTile>(out NonBuyableTile nonBuyableTile);
+        if (nonBuyableTile != null)
+            return nonBuyableTile.GetPlayerPosition(playerId);
+
+        return new Vector3(0, 0, 0);
+    }
+
+    [Client]
+    public string ChangePriceToText(float price)
+    {
+        string toReturn;
+
+        if (price < 1000000)
+            toReturn = (price / 1000).ToString() + "K";
+        else
+            toReturn = (price / 1000000).ToString() + "M";
+        return toReturn;
+    }
+
+        [Server]
+    public void ChangeMoneyDisplayed()
+    {
+        foreach (MyNetworkPlayer p in networkPlayers) {
+            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
+        }
+    }
+
+    IEnumerator MyWaitForSeconds(float time)
+    {
+        yield return new WaitForSeconds(time);
     }
 
     #endregion
