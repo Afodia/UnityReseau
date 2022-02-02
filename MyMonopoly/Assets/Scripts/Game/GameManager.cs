@@ -9,6 +9,7 @@ public class GameManager : NetworkBehaviour
 {
     [SerializeField] GameObject playerPrefab;
     [SerializeField] GameObject[] Tiles;
+    [SerializeField] List<MonopoliesLine> MonopoliesLines;
     public static GameManager instance;
     private GameManager() { }
 
@@ -96,12 +97,6 @@ public class GameManager : NetworkBehaviour
                 StartCoroutine(OnWaitRollingPhase());
                 break;
         }
-    }
-
-    [Command(requiresAuthority = false)]
-    void CmdLaunchDice()
-    {
-        RollDices();
     }
 
     [Server]
@@ -205,10 +200,22 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
-        //if (NetworkServer.connections.Count <= 1) {
+        // if (NetworkServer.connections.Count <= 1) {
         //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
         //   return;
-        //}
+        // }
+
+        CheckAndUpdateMonopoliesStates();
+        if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you own all the beaches !");
+            return;
+        } else if (GetPlayerNbMonopolies(currPlayer.GetPlayerId()) >= 3) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have 3 monopolies !");
+            return;
+        } else if (PlayerHasMonopolyLine(currPlayer.GetPlayerId())) {
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have a monopolies line !");
+            return;
+        }
 
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
         if (nextPlayerId > networkPlayers.Count)
@@ -253,25 +260,6 @@ public class GameManager : NetworkBehaviour
 
         }
     }
-
-    [Command(requiresAuthority = false)]
-    public void CmdUpgradeBuilding(int upgradeLvl)
-    {
-        CheckUpgrade(upgradeLvl);
-    }
-
-    [Command(requiresAuthority = false)]
-    public void CmdSellTiles(int[] tilesIDsToSell)
-    {
-        foreach (int tileID in tilesIDsToSell) {
-            if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
-                currPlayer.ChangeMoney(tile.GetSellPrice());
-                tile.SellTile(currPlayer);
-                ChangeMoneyDisplayed();
-            }
-        }
-    }
-
 
     [Server]
     public List<BuyableTile> GetPlayerOwnedTiles(int playerId)
@@ -338,6 +326,39 @@ public class GameManager : NetworkBehaviour
 
     }
 
+    [Server]
+    public void CheckAndUpdateMonopoliesStates()
+    {
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+                if (monopoly.IsMonopoly())
+                    foreach (BuyableTile tile in monopoly.tiles)
+                        tile.SetMonopoly(true);
+    }
+
+    [Server]
+    public int GetPlayerNbMonopolies(int playerId)
+    {
+        int nbMonopolies = 0;
+
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+                if (monopoly.IsMonopoly() && monopoly.GetMonopolyOwnerId() == playerId)
+                    nbMonopolies++;
+
+        return nbMonopolies;
+    }
+
+    [Server]
+    public bool PlayerHasMonopolyLine(int playerId)
+    {
+        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
+            if (monopoliesLine.IsLinearMonopoly() && monopoliesLine.GetMonopoliesLineOwnerId() == playerId)
+                return true;
+
+        return false;
+    }
+
     #endregion
     #region Client
 
@@ -360,6 +381,12 @@ public class GameManager : NetworkBehaviour
         CmdLaunchDice();
     }
 
+    [Command(requiresAuthority = false)]
+    void CmdLaunchDice()
+    {
+        RollDices();
+    }
+
     [Client]
     public string ChangePriceToText(float price)
     {
@@ -370,6 +397,24 @@ public class GameManager : NetworkBehaviour
         else
             toReturn = (price / 1000000).ToString() + "M";
         return toReturn;
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdUpgradeBuilding(int upgradeLvl)
+    {
+        CheckUpgrade(upgradeLvl);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSellTiles(int[] tilesIDsToSell)
+    {
+        foreach (int tileID in tilesIDsToSell) {
+            if (Tiles[tileID].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
+                currPlayer.ChangeMoney(tile.GetSellPrice());
+                tile.SellTile(currPlayer);
+                ChangeMoneyDisplayed();
+            }
+        }
     }
 
     #endregion

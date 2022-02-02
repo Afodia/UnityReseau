@@ -46,7 +46,7 @@ public abstract class Tile : NetworkBehaviour
         return _id;
     }
 
-    [TargetRpc]
+    [ClientRpc]
     public void RpcSetId(int id)
     {
         this._id = id;
