@@ -8,6 +8,31 @@ using Mirror;
 
 public class UIPanel : NetworkBehaviour
 {
+    #region LuckCard
+
+    [Header("Luck card panel")]
+
+    [SerializeField] GameObject luckCardPanel;
+    [SerializeField] TMP_Text description;
+    CardsData currCard;
+
+    [Client]
+    public void ShowLuckCard(CardsData card)
+    {
+        currCard = card;
+        luckCardPanel.SetActive(true);
+        description.text = card.description;
+    }
+
+    [Client]
+    public void TakeCard()
+    {
+        luckCardPanel.SetActive(false);
+        GameManager.instance.CmdCardTaken(currCard);
+    }
+
+    #endregion
+
     #region UpgradePanel
 
     [Header("Upgrade panel")]
@@ -33,8 +58,6 @@ public class UIPanel : NetworkBehaviour
     [Client]
     public void ShowUpgradePanel(TilesData data, int[] housesId, int lvl, float money)
     {
-        Debug.Log("show panel");
-
         float toBuy = 0;
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);

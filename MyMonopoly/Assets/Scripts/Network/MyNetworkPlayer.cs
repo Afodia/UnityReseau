@@ -162,8 +162,13 @@ public class MyNetworkPlayer : NetworkBehaviour
     [TargetRpc]
     public void RpcDisplayUpgradeOffer(TilesData price, int[] houses, int lvl)
     {
-        Debug.Log("display upgrade");
         GetComponent<UIPanel>().ShowUpgradePanel(price, houses, lvl, money);
+    }
+
+    [TargetRpc]
+    public void RpcDisplayLuckCards(CardsData card)
+    {
+        GetComponent<UIPanel>().ShowLuckCard(card);
     }
 
     [TargetRpc]

@@ -14,6 +14,7 @@ public class BuyableTile : Tile
     [SerializeField] SpriteRenderer house;
     [SerializeField] GameObject[] playerPos;
     [SerializeField] Sprite[] houses = new Sprite[16];
+    [SerializeField] CardsData[] luckCards;
 
     private bool isMonopole = false;
     private int ownerId = 0;
@@ -26,11 +27,31 @@ public class BuyableTile : Tile
     public override void Action(MyNetworkPlayer player, int tileId)
     {
         player.ChangeMoney(-500000);
-        if (ownerId == 0 || ownerId == player.GetPlayerId())
-            UpgradeTile(player);
-        else if (player.GetPlayerId() != ownerId)
-            PayRent(player);
+        if (type == Type.Luck) {
+            LuckTile(player);
+        } else if (type == Type.Train) {
+            TrainTile();
+        } else {
+            if (ownerId == 0 || ownerId == player.GetPlayerId())
+                UpgradeTile(player);
+            else if (player.GetPlayerId() != ownerId)
+                PayRent(player);
+        }
         GameManager.instance.TileActionEnded();
+    }
+
+    [Server]
+    private void TrainTile()
+    {
+
+    }
+
+    [Server]
+    private void LuckTile(MyNetworkPlayer player)
+    {
+        int rand = Random.Range(0, luckCards.Length);
+
+        player.RpcDisplayLuckCards(luckCards[rand]);
     }
 
     [Server]
