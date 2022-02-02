@@ -262,6 +262,18 @@ public class GameManager : NetworkBehaviour
     }
 
     [Server]
+    private void CardTaken(CardsData card)
+    {
+        if (card.type == CardsData.Type.Add) {
+            currPlayer.ChangeMoney(card.value);
+            ChangeMoneyDisplayed();
+        } else if (card.type == CardsData.Type.Remove) {
+            currPlayer.ChangeMoney(-card.value);
+            ChangeMoneyDisplayed();
+        }
+    }
+
+    [Server]
     public List<BuyableTile> GetPlayerOwnedTiles(int playerId)
     {
         List<BuyableTile> ownedTiles = new List<BuyableTile>();
@@ -403,6 +415,12 @@ public class GameManager : NetworkBehaviour
     public void CmdUpgradeBuilding(int upgradeLvl)
     {
         CheckUpgrade(upgradeLvl);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdCardTaken(CardsData card)
+    {
+        CardTaken(card);
     }
 
     [Command(requiresAuthority = false)]
