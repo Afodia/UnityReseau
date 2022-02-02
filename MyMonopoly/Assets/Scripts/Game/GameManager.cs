@@ -257,7 +257,6 @@ public class GameManager : NetworkBehaviour
                 tile.UpdateTile(currPlayer.GetPlayerId(), upgradeLvl);
                 ChangeMoneyDisplayed();
             }
-
         }
     }
 
