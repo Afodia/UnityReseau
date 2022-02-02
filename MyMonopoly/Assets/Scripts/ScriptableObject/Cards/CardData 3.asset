@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5420a26d8bcc52a478a99defd68ef72b, type: 3}
   m_Name: CardData 3
   m_EditorClassIdentifier: 
-  type: 2
-  description: Go to Seville
-  value: 1
+  type: 0
+  description: You got theft ! Your insurance give you 50 000
+  value: 50000

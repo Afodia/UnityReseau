@@ -270,6 +270,9 @@ public class GameManager : NetworkBehaviour
         } else if (card.type == CardsData.Type.Remove) {
             currPlayer.ChangeMoney(-card.value);
             ChangeMoneyDisplayed();
+        } else {
+            currPlayer.SetTile((int)card.value);
+            currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
         }
     }
 
