@@ -2732,10 +2732,10 @@ MonoBehaviour:
   luckCardPanel: {fileID: 6703059042259794286}
   description: {fileID: 3209926256100511005}
   houses:
-  - {fileID: -1320074123, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -261572829, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -215689584, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -530748635, guid: 335418496264f344f86c9a1fde71388c, type: 3}
+  - {fileID: 21300000, guid: 8bdc43c6c4146704fa2225435b6f3455, type: 3}
+  - {fileID: 21300000, guid: 6de7b0bc5939fb84197c0d676e716979, type: 3}
+  - {fileID: 21300000, guid: 7d9fc3b95bcbb8a49813c91464cda88b, type: 3}
+  - {fileID: 21300000, guid: 13525658c58467845b26873b706fc6e4, type: 3}
   - {fileID: 21300000, guid: ac0e585a8f5b1a6469115480c129e054, type: 3}
   - {fileID: 21300000, guid: ba98058d487578743822223d8fa61ef7, type: 3}
   - {fileID: 21300000, guid: 8a85dfc7d1701264e9f6213c5acf60ee, type: 3}

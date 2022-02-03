@@ -157,6 +157,7 @@ GameObject:
   - component: {fileID: 1607915786971435858}
   - component: {fileID: 1607915786971435861}
   - component: {fileID: 1607915786971435860}
+  - component: {fileID: 5339126736264907954}
   m_Layer: 0
   m_Name: tile
   m_TagString: Untagged
@@ -251,6 +252,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95a2adb1c0cb81d4398f7153fe01ac17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   over: {fileID: 1607915786569463925}
   _id: 1
   type: 6
@@ -265,22 +268,39 @@ MonoBehaviour:
   - {fileID: 6785973448889810545}
   - {fileID: 1153872504942131241}
   houses:
-  - {fileID: -1320074123, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -261572829, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -215689584, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -530748635, guid: 335418496264f344f86c9a1fde71388c, type: 3}
-  - {fileID: -526438123, guid: 6cda874923e006a41909dd40e624ff19, type: 3}
-  - {fileID: 589449643, guid: 6cda874923e006a41909dd40e624ff19, type: 3}
-  - {fileID: -513491551, guid: 6cda874923e006a41909dd40e624ff19, type: 3}
-  - {fileID: 696076368, guid: 6cda874923e006a41909dd40e624ff19, type: 3}
+  - {fileID: 21300000, guid: 8bdc43c6c4146704fa2225435b6f3455, type: 3}
+  - {fileID: 21300000, guid: 6de7b0bc5939fb84197c0d676e716979, type: 3}
+  - {fileID: 21300000, guid: 7d9fc3b95bcbb8a49813c91464cda88b, type: 3}
+  - {fileID: 21300000, guid: 13525658c58467845b26873b706fc6e4, type: 3}
+  - {fileID: 21300000, guid: ac0e585a8f5b1a6469115480c129e054, type: 3}
+  - {fileID: 21300000, guid: ba98058d487578743822223d8fa61ef7, type: 3}
+  - {fileID: 21300000, guid: 8a85dfc7d1701264e9f6213c5acf60ee, type: 3}
+  - {fileID: 21300000, guid: bdffc5bf4ea253e49807267141eaabc4, type: 3}
   - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
   - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
   - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
   - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
-  - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
-  - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
-  - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
-  - {fileID: 21300000, guid: 2f1a67ece413f01489d22d36addb9965, type: 3}
+  - {fileID: 21300000, guid: ab6a60f7c3cf5b84aa809f6738ee801f, type: 3}
+  - {fileID: 21300000, guid: a7ace4678465d3643991b08bc12d83d6, type: 3}
+  - {fileID: 21300000, guid: cd3c1197da6f5ff48a7c004d1dbac1ab, type: 3}
+  - {fileID: 21300000, guid: 69dac1e7f067fca4caa45a249002a66f, type: 3}
+--- !u!114 &5339126736264907954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607915786971435863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 0
+  serverOnly: 0
+  visible: 0
+  m_AssetId: aa17ddad885046d46b2032d0b03c263a
+  hasSpawned: 0
 --- !u!1 &1607915787467135377
 GameObject:
   m_ObjectHideFlags: 0
