@@ -29,6 +29,9 @@ public class NonBuyableTile : Tile
             case Type.Start:
                 StartAction(player, tileId);
                 break;
+            default:
+                GameManager.instance.TileActionEnded();
+                break;
         }
     }
 
