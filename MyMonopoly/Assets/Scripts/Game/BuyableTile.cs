@@ -85,6 +85,7 @@ public class BuyableTile : Tile
     private void PayRent(MyNetworkPlayer player)
     {
         float rent = GetRent();
+        Debug.Log("Pay rent: " + rent);
 
         player.ChangeMoney(-rent);
         GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);

@@ -5005,6 +5005,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: LuckCard
       objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5833673793786268111}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: TakeCard
+      objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIPanel, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 3078179495335834428, guid: 3725a93018128bf4c962e37384e39211, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 4348339080787086879, guid: 3725a93018128bf4c962e37384e39211, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
