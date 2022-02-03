@@ -55,7 +55,7 @@ public class MyNetworkPlayer : NetworkBehaviour
         if (this.money + ownedTilesSellValue < needToBePaid) {
             GameManager.instance.SellAllOwnedTilesOfPlayer(this);
             TargetPlayerLose(this.playerId,
-            "you don't have enought money to pay what you owe\n" +
+            "don't have enought money to pay what you owe\n" +
             $"You had $ {this.money} on your pocket\n" +
             $"Your cities sell value was $ {ownedTilesSellValue}\n" +
             $"And you owed $ {needToBePaid}");
@@ -180,11 +180,9 @@ public class MyNetworkPlayer : NetworkBehaviour
        WinLoseMenu.SetActive(true);
 
        if (playerId != this.playerId) {
-           WinLoseText.text = $"Player {playerId} won because {reason}, so... you lost";
-           return;
-       }
-
-       WinLoseText.text = $"You won because {reason}";
+           WinLoseText.text = $"Player {playerId} won because you {reason}, so... you lost";
+       } else
+           WinLoseText.text = $"You won because {reason}";
     }
 
     [TargetRpc]
@@ -194,7 +192,7 @@ public class MyNetworkPlayer : NetworkBehaviour
             return;
 
        WinLoseMenu.SetActive(true);
-       WinLoseText.text = $"You lose because {reason}";
+       WinLoseText.text = $"You lose because you {reason}";
     }
 
     #endregion
