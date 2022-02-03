@@ -221,18 +221,18 @@ public class GameManager : NetworkBehaviour
         CheckAndUpdateMonopoliesStates();
 
         // if (NetworkServer.connections.Count <= 1) {
-        //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
+        //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "are the last player connected !");
         //   return;
         // }
 
         if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you own all the beaches !");
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "own all the beaches !");
             return;
         } else if (GetPlayerNbMonopolies(currPlayer.GetPlayerId()) >= 3) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have 3 monopolies !");
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "have 3 monopolies !");
             return;
         } else if (PlayerHasMonopolyLine(currPlayer.GetPlayerId())) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you have a monopolies line !");
+            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "have a monopolies line !");
             return;
         }
 
@@ -363,7 +363,7 @@ public class GameManager : NetworkBehaviour
         networkPlayers.Remove(disconnectedPlayer);
 
         if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1)
-            networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "you are the last player connected !");
+            networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "are the last player connected !");
     }
 
     [Server]
@@ -371,9 +371,15 @@ public class GameManager : NetworkBehaviour
     {
         foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
             foreach (Monopoly monopoly in monopoliesLine.monopolies)
-                if (monopoly.IsMonopoly())
-                    foreach (BuyableTile tile in monopoly.tiles)
-                        tile.SetMonopoly(true);
+                SetTilesMonopolyState(monopoly, monopoly.IsMonopoly());
+    }
+
+    [Server]
+    void SetTilesMonopolyState(Monopoly monopoly, bool state)
+    {
+        foreach (BuyableTile tile in monopoly.tiles)
+            if (tile.IsMonopoly() != state)
+                tile.SetMonopoly(state);
     }
 
     [Server]
