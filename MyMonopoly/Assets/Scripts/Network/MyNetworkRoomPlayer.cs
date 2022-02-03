@@ -24,6 +24,7 @@ public class MyNetworkRoomPlayer : NetworkRoomPlayer
         }
     }
 
+    public GUIStyle tmpStyle;
     void DrawPlayerReadyState()
     {
         float[] posArray = new float[4] {(Screen.width - 100f) / 10 * 2, (Screen.width - 100f) / 10 * 4, (Screen.width - 100f) / 10 * 6, (Screen.width - 100f) / 10 * 8};
@@ -44,8 +45,7 @@ public class MyNetworkRoomPlayer : NetworkRoomPlayer
 
     void DrawPlayerReadyButton()
     {
-        if (NetworkClient.active && isLocalPlayer)
-        {
+        if (NetworkClient.active && isLocalPlayer) {
             GUILayout.BeginArea(new Rect(Screen.width / 2 - 60f, Screen.height / 2f + 100f, 120f, 20f));
 
             if (readyToBegin) {

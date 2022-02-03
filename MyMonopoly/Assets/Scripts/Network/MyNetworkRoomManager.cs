@@ -57,7 +57,8 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// </summary>
     /// <param name="conn">The connection that disconnected.</param>
     public override void OnRoomServerDisconnect(NetworkConnection conn) {
-        GameManager.instance.OnPlayerDisconnected(conn);
+        if (IsSceneActive(GameplayScene))
+            GameManager.instance.OnPlayerDisconnected(conn);
     }
 
     /// <summary>
@@ -163,7 +164,10 @@ public class MyNetworkRoomManager : NetworkRoomManager
     /// </summary>
     public override void OnRoomClientDisconnect()
     {
-        ShowErrorMenu("You have been disconnected from the server.", Color.black);
+        if (IsSceneActive(GameplayScene))
+            ShowErrorMenu("You have been disconnected from the server.", Color.black);
+        else
+            ShowErrorMenu("You didn't find any server on this IP + port.", Color.black);
     }
 
     /// <summary>
