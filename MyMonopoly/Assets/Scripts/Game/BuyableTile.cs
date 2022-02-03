@@ -17,7 +17,7 @@ public class BuyableTile : Tile
 
     private bool isMonopoly = false;
     private int ownerId = 0;
-    private int currLvl = 0;
+    private int currLvl = -1;
 
     #region Server
     
@@ -38,6 +38,7 @@ public class BuyableTile : Tile
     [Server]
     private void TrainTile()
     {
+        Debug.Log("train tile");
         GameManager.instance.TileActionEnded();
     }
 
@@ -56,7 +57,7 @@ public class BuyableTile : Tile
         for (int i = 0 ; i < 4 ; i++)
             toSend[i] = player.GetPlayerId() - 1 + (i * 4);
 
-        if (player.GetMoney() >= data.upgradePrice[currLvl])
+        if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
     }
 
@@ -119,7 +120,7 @@ public class BuyableTile : Tile
     public float GetUpgrade(int lvl)
     {
         float toBuy = 0;
-        for (int i = currLvl ; i <= lvl ; i++)
+        for (int i = currLvl == -1 ? 0 : currLvl ; i <= lvl ; i++)
             toBuy += data.upgradePrice[i];
         return toBuy;
     }
@@ -158,7 +159,7 @@ public class BuyableTile : Tile
     public void SellTile(MyNetworkPlayer currentPlayer)
     {
         currentPlayer.ChangeMoney(GetSellPrice());
-        UpdateTile(0, 0);
+        UpdateTile(0, -1);
     }
 
     [Server]

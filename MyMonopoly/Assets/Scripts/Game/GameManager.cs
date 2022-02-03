@@ -159,13 +159,15 @@ public class GameManager : NetworkBehaviour
         yield return new WaitUntil(() => !currPlayer.launchingDice);
         currPlayer.RpcHideDices();
 
-        if (nbDouble >= 3 || currPlayer.isInJail()) {
+        if (nbDouble >= 3) {
             Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
             this.previousActionFinished = false;
             Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
-            TileActionEnded();
-        } else
+            currPhase = Phase.NextTurn;
+        } else if (currPlayer.isInJail())
+            currPhase = Phase.NextTurn;
+        else
             currPhase = Phase.Move;
 
         PhaseChange();
@@ -175,7 +177,7 @@ public class GameManager : NetworkBehaviour
     void OnMovePhase()
     {
         int newPos = currPlayer.GetTile() + diceResult;
-
+        Debug.Log($"Dice result : {diceResult}");
         if (newPos > Tiles.Length - 1) {
             Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
             this.previousActionFinished = false;
@@ -205,11 +207,10 @@ public class GameManager : NetworkBehaviour
         Debug.Log("TileActionEnded");
         Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to true");
         this.previousActionFinished = true;
-
         if (currPlayer.isInJail())
-            playAgain = false;
-
-        currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
+            currPhase = Phase.NextTurn;
+        else
+            currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
 
@@ -290,6 +291,10 @@ public class GameManager : NetworkBehaviour
             currPlayer.ChangeMoney(-card.value);
             ChangeMoneyDisplayed();
         } else {
+            if (currPlayer.GetTile() > card.value && card.value != 24) {
+                currPlayer.ChangeMoney(300000);
+                ChangeMoneyDisplayed();
+            }
             currPlayer.SetTile((int)card.value);
             currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
             Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
