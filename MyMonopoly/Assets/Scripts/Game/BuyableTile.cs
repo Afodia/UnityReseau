@@ -26,17 +26,19 @@ public class BuyableTile : Tile
     public override void Action(MyNetworkPlayer player, int tileId)
     {
         if (type == Type.Train)
-            TrainTile();
+            BeachTile();
         else {
-            if (ownerId == 0 || ownerId == player.GetPlayerId())
+            if ((ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
                 UpgradeTile(player);
             else if (player.GetPlayerId() != ownerId)
                 PayRent(player);
+            else
+                GameManager.instance.TileActionEnded();
         }
     }
 
     [Server]
-    private void TrainTile()
+    private void BeachTile()
     {
         Debug.Log("train tile");
         GameManager.instance.TileActionEnded();
@@ -59,6 +61,8 @@ public class BuyableTile : Tile
 
         if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
+        else
+            GameManager.instance.TileActionEnded();
     }
 
     [Server]
@@ -73,7 +77,8 @@ public class BuyableTile : Tile
     [ClientRpc]
     private void UpdateUI(int pId, int lvl)
     {
-        Debug.Log($"Updating UI for {data.name}, price: {data.upgradePrice[lvl]}, owner: {pId}, lvl: {lvl}, isMonopoly: {isMonopoly}");
+        Debug.Log("lvl : " + lvl);
+        Debug.Log($"Updating UI for {data.tileName}, price: {data.upgradePrice[lvl]}, owner: {pId}, lvl: {lvl}, isMonopoly: {isMonopoly}");
         if (pId == 0) {
             price.text = "";
             house.sprite = null;

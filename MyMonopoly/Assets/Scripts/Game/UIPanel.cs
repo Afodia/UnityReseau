@@ -45,7 +45,7 @@ public class UIPanel : NetworkBehaviour
     [SerializeField] GameObject[] upgradePanels;
 
 
-    int upgradeLevel = 0;
+    int upgradeLevel = -1;
     TilesData currData;
     int currLvl;
 
@@ -60,13 +60,19 @@ public class UIPanel : NetworkBehaviour
     public void ShowUpgradePanel(TilesData data, int[] housesId, int lvl, float money)
     {
         float toBuy = 0;
+        float alreadyBought = 0;
+        for (int i = 0 ; i <= lvl ; i++)
+            alreadyBought += currData.upgradePrice[i];
+        Debug.Log($"Tile lvl : {lvl}, player money : {money}");
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
         for (int i = 0 ; i < upgradePanels.Length ; i++) {
             upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[housesId[i]];
             upgradePanels[i].GetComponentInChildren<TMP_Text>().text = GameManager.instance.ChangePriceToText(data.upgradePrice[i]);
             toBuy += data.upgradePrice[i];
-            if (i <= lvl || toBuy > money) {
+            Debug.Log($"toBuy {toBuy} for i {i}");
+            Debug.Log($"already bought {alreadyBought} for i {i}");
+            if (i <= lvl || (toBuy - alreadyBought) > money) {
                 upgradePanels[i].GetComponent<Button>().enabled = false;
                 if (lvl != -1 && i <= lvl)
                     upgradePanels[i].transform.Find("Selection").gameObject.SetActive(true); 
@@ -75,15 +81,18 @@ public class UIPanel : NetworkBehaviour
         currLvl = lvl;
         currData = data;
         upgradeCity.text = data.tileName;
+        UpgradeUpdate();
     }
 
     [Client]
     void UpgradeUpdate()
     {
+        Debug.Log("upgrade panel, new lvl :" + upgradeLevel);
         float toBuy = 0;
         for (int i = currLvl + 1 ; i <= upgradeLevel ; i++)
             toBuy += currData.upgradePrice[i];
-        upgradeRent.text = "Rent rate: " + GameManager.instance.ChangePriceToText(currData.rentPrice[upgradeLevel]);
+        if (upgradeLevel != -1)
+            upgradeRent.text = "Rent rate: " + GameManager.instance.ChangePriceToText(currData.rentPrice[upgradeLevel]);
         if (currLvl == upgradeLevel) {
             upgradeButton.text = "No upgrade selected";
             upgradeBtn.enabled = false;
