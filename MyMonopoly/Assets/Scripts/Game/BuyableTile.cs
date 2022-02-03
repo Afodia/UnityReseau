@@ -61,8 +61,10 @@ public class BuyableTile : Tile
 
         if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
-        else
+        else {
+            Debug.Log("couldn't buy");
             GameManager.instance.TileActionEnded();
+        }
     }
 
     [Server]
