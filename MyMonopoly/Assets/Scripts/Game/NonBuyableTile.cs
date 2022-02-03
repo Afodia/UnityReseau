@@ -53,7 +53,7 @@ public class NonBuyableTile : Tile
     {
         int rand = Random.Range(0, luckCards.Length);
 
-        player.RpcDisplayLuckCards(luckCards[rand]);
+        player.RpcDisplayLuckCards(luckCards[3]);
     }
 
     [Server]

@@ -39,6 +39,7 @@ public class UIPanel : NetworkBehaviour
     [SerializeField] Sprite[] houses = new Sprite[16];
     [SerializeField] TMP_Text upgradeCity;
     [SerializeField] TMP_Text upgradeRent;
+    [SerializeField] Button upgradeBtn;
     [SerializeField] TMP_Text upgradeButton;
     [SerializeField] GameObject upgradePanel;
     [SerializeField] GameObject[] upgradePanels;
@@ -65,9 +66,10 @@ public class UIPanel : NetworkBehaviour
             upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[housesId[i]];
             upgradePanels[i].GetComponentInChildren<TMP_Text>().text = GameManager.instance.ChangePriceToText(data.upgradePrice[i]);
             toBuy += data.upgradePrice[i];
-            if (i < lvl || toBuy > money) {
-                upgradePanels[i].transform.Find("Selection").gameObject.SetActive(true);
+            if (i <= lvl || toBuy > money) {
                 upgradePanels[i].GetComponent<Button>().enabled = false;
+                if (lvl != -1 && i <= lvl)
+                    upgradePanels[i].transform.Find("Selection").gameObject.SetActive(true); 
             }
         }
         currLvl = lvl;
@@ -79,12 +81,13 @@ public class UIPanel : NetworkBehaviour
     void UpgradeUpdate()
     {
         float toBuy = 0;
-        for (int i = currLvl ; i <= upgradeLevel ; i++)
+        for (int i = currLvl + 1 ; i <= upgradeLevel ; i++)
             toBuy += currData.upgradePrice[i];
         upgradeRent.text = "Rent rate: " + GameManager.instance.ChangePriceToText(currData.rentPrice[upgradeLevel]);
-        if (toBuy == 0)
+        if (currLvl == upgradeLevel) {
             upgradeButton.text = "No upgrade selected";
-        else
+            upgradeBtn.enabled = false;
+        } else
             upgradeButton.text = "Buy For " + GameManager.instance.ChangePriceToText(toBuy);
     }
 
