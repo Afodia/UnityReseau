@@ -162,6 +162,12 @@ public class MyNetworkPlayer : NetworkBehaviour
     }
 
     [TargetRpc]
+    public void RpcDisplayBuyBeachOffer(TilesData tileData)
+    {
+        GetComponent<UIPanel>().ShowBuyBeachPanel(tileData);
+    }
+
+    [TargetRpc]
     public void RpcDisplayLuckCards(CardsData card)
     {
         GetComponent<UIPanel>().ShowLuckCard(card);

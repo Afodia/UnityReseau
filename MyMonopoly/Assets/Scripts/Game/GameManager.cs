@@ -413,7 +413,7 @@ public class GameManager : NetworkBehaviour
             List<int> playerOwnedBeachesIds = GetBeachTilesIdsOfPlayer(player.GetPlayerId());
 
             foreach (int beachId in playerOwnedBeachesIds)
-                Tiles[beachId].GetComponent<BuyableTile>().UpdateTile(player.GetPlayerId(), playerOwnedBeachesIds.Count);
+                Tiles[beachId].GetComponent<BuyableTile>().UpdateTile(player.GetPlayerId(), playerOwnedBeachesIds.Count - 1);
         }
     }
 

@@ -128,6 +128,44 @@ public class UIPanel : NetworkBehaviour
 
 
 
+    #region BeachPanel
+
+    [Header("Beach panel")]
+    [SerializeField] GameObject beachPanel;
+    [SerializeField] TMP_Text beachName;
+
+    [Client]
+    public void ShowBuyBeachPanel(TilesData data)
+    {
+        beachPanel.SetActive(true);
+        beachName.text = data.tileName;
+    }
+
+    [Client]
+    public void ResetBuyBeachUi()
+    {
+        beachPanel.SetActive(false);
+        beachName.text = "";
+    }
+
+    [Client]
+    public void ValidateBuyBeach()
+    {
+        ResetBuyBeachUi();
+        GameManager.instance.CmdUpgradeBuilding(0);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CancelBuyBeach()
+    {
+        ResetBuyBeachUi();
+        GameManager.instance.TileActionEnded();
+    }
+
+    #endregion
+
+
+
     #region SellPanel
 
     [Header("Sell panel")]

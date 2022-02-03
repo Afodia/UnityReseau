@@ -10,7 +10,7 @@ public class Monopoly
 
     public bool IsMonopoly()
     {
-        if (this.tiles.Count == 0)
+        if (this.tiles.Count >= 1)
             return false;
 
         int ownerId = tiles[0].GetOwnerId();
