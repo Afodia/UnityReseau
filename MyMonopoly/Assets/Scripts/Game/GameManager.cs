@@ -164,7 +164,7 @@ public class GameManager : NetworkBehaviour
             this.previousActionFinished = false;
             Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
-            currPhase = Phase.NextTurn;
+            TileActionEnded();
         } else
             currPhase = Phase.Move;
 
@@ -205,6 +205,10 @@ public class GameManager : NetworkBehaviour
         Debug.Log("TileActionEnded");
         Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to true");
         this.previousActionFinished = true;
+
+        if (currPlayer.isInJail())
+            playAgain = false;
+
         currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
         PhaseChange();
     }
