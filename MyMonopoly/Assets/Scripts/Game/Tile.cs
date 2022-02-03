@@ -17,7 +17,7 @@ public abstract class Tile : NetworkBehaviour
         Jail,
         GoToJail,
         Luck,
-        Train,
+        Beach,
         Square,
         House,
         Taxes

@@ -218,6 +218,7 @@ public class GameManager : NetworkBehaviour
     void OnNextTurnPhase()
     {
         ChangeMoneyDisplayed();
+        CheckAndUpdateBeachesTiles();
         CheckAndUpdateMonopoliesStates();
 
         // if (NetworkServer.connections.Count <= 1) {
@@ -383,7 +384,7 @@ public class GameManager : NetworkBehaviour
     }
 
     [Server]
-    public int GetPlayerNbMonopolies(int playerId)
+    int GetPlayerNbMonopolies(int playerId)
     {
         int nbMonopolies = 0;
 
@@ -396,13 +397,36 @@ public class GameManager : NetworkBehaviour
     }
 
     [Server]
-    public bool PlayerHasMonopolyLine(int playerId)
+    bool PlayerHasMonopolyLine(int playerId)
     {
         foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
             if (monopoliesLine.IsLinearMonopoly() && monopoliesLine.GetMonopoliesLineOwnerId() == playerId)
                 return true;
 
         return false;
+    }
+
+    [Server]
+    void CheckAndUpdateBeachesTiles()
+    {
+        foreach (MyNetworkPlayer player in networkPlayers) {
+            List<int> playerOwnedBeachesIds = GetBeachTilesIdsOfPlayer(player.GetPlayerId());
+
+            foreach (int beachId in playerOwnedBeachesIds)
+                Tiles[beachId].GetComponent<BuyableTile>().UpdateTile(player.GetPlayerId(), playerOwnedBeachesIds.Count);
+        }
+    }
+
+    [Server]
+    List<int> GetBeachTilesIdsOfPlayer(int playerId)
+    {
+        List<int> beachTilesIds = new List<int>();
+
+        foreach (BuyableTile tile in MonopoliesLines[0].monopolies[0].tiles)
+            if (tile.GetOwnerId() == playerId)
+                beachTilesIds.Add(tile.GetId());
+
+        return beachTilesIds;
     }
 
     #endregion
