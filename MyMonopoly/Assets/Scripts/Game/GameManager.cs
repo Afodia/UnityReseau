@@ -144,10 +144,9 @@ public class GameManager : NetworkBehaviour
             }
             nbDouble += 1;
             playAgain = true;
-        }
-
-        if (currPlayer.isInJail()) {
-            currPlayer.IncreaseNbTurnInJail();
+        } else {
+            if (currPlayer.isInJail())
+                currPlayer.IncreaseNbTurnInJail();
         }
 
         currPhase = Phase.WaitRolling;
@@ -187,8 +186,6 @@ public class GameManager : NetworkBehaviour
         currPlayer.SetTile(newPos);
         currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos, currPlayer.GetPlayerId()));
 
-        StartCoroutine(MyWaitForSeconds(1f));
-
         currPhase = Phase.TileAction;
         PhaseChange();
     }
@@ -215,12 +212,14 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
+        ChangeMoneyDisplayed();
+        CheckAndUpdateMonopoliesStates();
+
         // if (NetworkServer.connections.Count <= 1) {
         //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you are the last player connected !");
         //   return;
         // }
 
-        CheckAndUpdateMonopoliesStates();
         if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
             currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "you own all the beaches !");
             return;
@@ -266,7 +265,6 @@ public class GameManager : NetworkBehaviour
     private void CheckUpgrade(int upgradeLvl)
     {
         if (Tiles[currPlayer.GetTile()].TryGetComponent<BuyableTile>(out BuyableTile tile)) {
-            Debug.Log($"currPlayer id: {currPlayer.GetPlayerId()}");
             float money = tile.GetUpgrade(upgradeLvl);
             if (currPlayer.GetMoney() >= money) {
                 currPlayer.ChangeMoney(-money);
@@ -290,6 +288,8 @@ public class GameManager : NetworkBehaviour
         } else {
             currPlayer.SetTile((int)card.value);
             currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
+            Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
+            return;
         }
 
         TileActionEnded();
@@ -472,11 +472,6 @@ public class GameManager : NetworkBehaviour
         foreach (MyNetworkPlayer p in networkPlayers) {
             p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
         }
-    }
-
-    IEnumerator MyWaitForSeconds(float time)
-    {
-        yield return new WaitForSeconds(time);
     }
 
     #endregion

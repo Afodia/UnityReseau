@@ -72,6 +72,7 @@ public class BuyableTile : Tile
     [ClientRpc]
     private void UpdateUI(int pId, int lvl)
     {
+        Debug.Log($"Updating UI for {data.name}, price: {data.upgradePrice[lvl]}, owner: {pId}, lvl: {lvl}, isMonopoly: {isMonopoly}");
         if (pId == 0) {
             price.text = "";
             house.sprite = null;
@@ -79,16 +80,20 @@ public class BuyableTile : Tile
             price.text = GameManager.instance.ChangePriceToText(data.rentPrice[lvl] * (System.Convert.ToSingle(isMonopoly) + 1f));
             house.sprite = houses[(pId - 1) + (lvl * 4)];
         }
+        Debug.Log($"Updated UI for {data.name}, price: {data.upgradePrice[lvl]}, owner: {pId}, lvl: {lvl}, isMonopoly: {isMonopoly}");
     }
 
     [Server]
     private void PayRent(MyNetworkPlayer player)
     {
         float rent = GetRent();
-        Debug.Log("Pay rent: " + rent);
+        Debug.Log($"Pay rent: {rent}, playermoney: {player.GetMoney()}, ownermoney: {GameManager.instance.GetPlayer(ownerId).GetMoney()}");
 
         player.ChangeMoney(-rent);
         GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);
+
+        GameManager.instance.ChangeMoneyDisplayed();
+        Debug.Log($"Rent payed, playermoney: {player.GetMoney()}, ownermoney: {GameManager.instance.GetPlayer(ownerId).GetMoney()}");
         GameManager.instance.TileActionEnded();
     }
 
@@ -160,7 +165,14 @@ public class BuyableTile : Tile
     public void SetMonopoly(bool state)
     {
         this.isMonopoly = state;
+        RpcSetMonopoly(state);
         UpdateTile(this.ownerId, this.currLvl);
+    }
+
+    [ClientRpc]
+    public void RpcSetMonopoly(bool state)
+    {
+        this.isMonopoly = state;
     }
 
     [Server]

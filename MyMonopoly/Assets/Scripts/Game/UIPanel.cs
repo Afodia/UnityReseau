@@ -88,6 +88,7 @@ public class UIPanel : NetworkBehaviour
             upgradeButton.text = "Buy For " + GameManager.instance.ChangePriceToText(toBuy);
     }
 
+    [Client]
     private void ResetBuyUi()
     {
         upgradePanel.SetActive(false);
@@ -103,7 +104,7 @@ public class UIPanel : NetworkBehaviour
         GameManager.instance.CmdUpgradeBuilding(upgradeLevel);
     }
 
-    [Client]
+    [Command(requiresAuthority = false)]
     public void CancelBuy()
     {
         ResetBuyUi();
@@ -135,7 +136,7 @@ public class UIPanel : NetworkBehaviour
             citiesButtons[i].SetButtonsInformations(this, playerOwnedCities[i].ClientGetId(), playerOwnedCities[i].ClientGetTileName(), playerOwnedCities[i].ClientGetSellPrice());
     }
 
-    [TargetRpc]
+    [Client]
     public void TargetHideSellPanel()
     {
         sellPanel.SetActive(false);

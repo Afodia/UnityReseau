@@ -110,8 +110,6 @@ public class MyNetworkPlayer : NetworkBehaviour
     [TargetRpc]
     public void TargetHideDiceButton()
     {
-        Debug.Log("hide button");
-
         DicesButton.SetActive(false);
     }
 
