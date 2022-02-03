@@ -25,7 +25,7 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        if (type == Type.Train)
+        if (type == Type.Beach)
             BeachTile();
         else {
             if ((ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
@@ -40,7 +40,7 @@ public class BuyableTile : Tile
     [Server]
     private void BeachTile()
     {
-        Debug.Log("train tile");
+        Debug.Log("Beach tile");
         GameManager.instance.TileActionEnded();
     }
 
@@ -72,12 +72,11 @@ public class BuyableTile : Tile
     {
         this.currLvl = lvl;
         this.ownerId = pId;
-        UpdateUI(pId, lvl);
-        return;
+        RpcUpdateUI(pId, lvl);
     }
 
     [ClientRpc]
-    private void UpdateUI(int pId, int lvl)
+    private void RpcUpdateUI(int pId, int lvl)
     {
         Debug.Log("lvl : " + lvl);
         if (pId == 0) {
@@ -200,7 +199,6 @@ public class BuyableTile : Tile
     {
         return this.data.sellPrice[currLvl];
     }
-
 
     private void Start()
     {
