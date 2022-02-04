@@ -69,6 +69,7 @@ public class BuyableTile : Tile
     public void UpdateTile(int pId, int lvl)
     {
         this.currLvl = lvl;
+        RpcSetTileLevel(lvl);
         this.ownerId = pId;
         RpcUpdateUI(pId, lvl);
     }
@@ -135,10 +136,16 @@ public class BuyableTile : Tile
         return this.currLvl;
     }
 
+    [ClientRpc]
+    void RpcSetTileLevel(int lvl)
+    {
+        this.currLvl = lvl;
+    }
+
     [Server]
     public override Vector3 GetPlayerPosition(int playerId)
     {
-        return playerPos[playerId - 1].transform.position;
+        return this.playerPos[playerId - 1].transform.position;
     }
 
     [Server]
@@ -150,7 +157,7 @@ public class BuyableTile : Tile
     [Server]
     public float GetSellPrice()
     {
-        return this.data.sellPrice[currLvl];
+        return this.data.sellPrice[this.currLvl];
     }
 
     [Server]
@@ -193,7 +200,7 @@ public class BuyableTile : Tile
     [Client]
     public float ClientGetSellPrice()
     {
-        return this.data.sellPrice[currLvl];
+        return this.data.sellPrice[this.currLvl];
     }
 
     private void Start()

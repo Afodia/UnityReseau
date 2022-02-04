@@ -185,9 +185,9 @@ public class MyNetworkPlayer : NetworkBehaviour
     {
        WinLoseMenu.SetActive(true);
 
-       if (playerId != this.playerId) {
-           WinLoseText.text = $"Player {playerId} won because you {reason}, so... you lost";
-       } else
+       if (playerId != this.playerId)
+           WinLoseText.text = $"Player {playerId} won because \"{reason}\" So... you lost";
+       else
            WinLoseText.text = $"You won because you {reason}";
     }
 
