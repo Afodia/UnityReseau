@@ -172,27 +172,27 @@ public class MyNetworkPlayer : NetworkBehaviour
     }
 
     [TargetRpc]
-    public void RpcDisplayLuckCards(CardsData card)
+    public void TargetDisplayLuckCards(CardsData card)
     {
         GetComponent<UIPanel>().ShowLuckCard(card);
     }
 
     [TargetRpc]
-    public void UpdateDisplayMoneyOfPlayer(int id, float money)
+    public void TargetUpdateDisplayMoneyOfPlayer(int id, float money)
     {
         TMP_Text playerMoneyText = playersUI[id - 1].transform.Find("PlayerMoney").GetComponent<TMP_Text>();
         playerMoneyText.text = $"$ {money.ToString("N0", CultureInfo.GetCultureInfo("en-US")).Replace(',', ' ')}";
     }
 
-    [ClientRpc]
-    public void RpcPlayerWin(int playerId, string reason)
+    [TargetRpc]
+    public void TargetPlayerWin(int playerId, string reason)
     {
        WinLoseMenu.SetActive(true);
 
-       if (playerId != this.playerId)
-           WinLoseText.text = $"Player {playerId} won because \"{reason}\" So... you lost";
-       else
+       if (playerId == this.playerId)
            WinLoseText.text = $"You won because you {reason}";
+       else
+           WinLoseText.text = $"Player {playerId} won because \"{reason}\" So... you lost.";
     }
 
     [TargetRpc]
@@ -312,7 +312,7 @@ public class MyNetworkPlayer : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void DisablePlayerAvatar()
+    public void RpcDisablePlayerAvatar()
     {
         PlayerAvatar.SetActive(false);
     }

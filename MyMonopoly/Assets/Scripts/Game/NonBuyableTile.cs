@@ -54,7 +54,7 @@ public class NonBuyableTile : Tile
     [Server]
     private void LuckAction(MyNetworkPlayer player)
     {
-        player.RpcDisplayLuckCards(luckCards[Random.Range(0, luckCards.Length)]);
+        player.TargetDisplayLuckCards(luckCards[Random.Range(0, luckCards.Length)]);
     }
 
     [Server]

@@ -55,7 +55,6 @@ namespace Mirror
         {
             Destroy(this.gameObject);
             NetworkManager.singleton.ServerChangeScene(mainMenuSceneName);
-            // SceneManager.LoadScene(mainMenuSceneName);
         }
 
         void Update()

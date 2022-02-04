@@ -192,6 +192,13 @@ public class GameManager : NetworkBehaviour
     }
 
     [Server]
+    void DisplayVictoryReason(int id, string reason)
+    {
+        foreach (MyNetworkPlayer player in networkPlayers)
+            player.TargetPlayerWin(id, reason);
+    }
+
+    [Server]
     public void TileActionEnded()
     {
         ChangeMoneyDisplayed();
@@ -199,18 +206,18 @@ public class GameManager : NetworkBehaviour
         CheckAndUpdateMonopoliesStates();
 
         if (NetworkServer.connections.Count <= 1) {
-          currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "are the last player connected !");
+          DisplayVictoryReason(currPlayer.GetPlayerId(), "are the last player connected !");
           return;
         }
 
         if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "own all the beaches !");
+            DisplayVictoryReason(currPlayer.GetPlayerId(), "own all the beaches !");
             return;
         } else if (GetPlayerNbMonopolies(currPlayer.GetPlayerId()) >= 3) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "have 3 monopolies !");
+            DisplayVictoryReason(currPlayer.GetPlayerId(), "have 3 monopolies !");
             return;
         } else if (PlayerHasMonopolyLine(currPlayer.GetPlayerId())) {
-            currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "have a monopolies line !");
+            DisplayVictoryReason(currPlayer.GetPlayerId(), "have a monopolies line !");
             return;
         }
 
@@ -330,7 +337,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void OnPlayerLose()
     {
-        currPlayer.DisablePlayerAvatar();
+        currPlayer.RpcDisablePlayerAvatar();
         playAgain = false;
         // TileActionEnded();
     }
@@ -350,7 +357,7 @@ public class GameManager : NetworkBehaviour
         networkPlayers.Remove(disconnectedPlayer);
 
         if (NetworkServer.connections.Count == 1 && networkPlayers.Count == 1)
-            networkPlayers[0].RpcPlayerWin(networkPlayers[0].GetPlayerId(), "are the last player connected !");
+            networkPlayers[0].TargetPlayerWin(networkPlayers[0].GetPlayerId(), "are the last player connected !");
     }
 
     [Server]
@@ -496,14 +503,14 @@ public class GameManager : NetworkBehaviour
     public void ChangeMoneyDisplayed()
     {
         foreach (MyNetworkPlayer p in networkPlayers)
-            p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
+            p.TargetUpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
     }
 
     [Server]
     public void ChangeMoneyDisplayedOfPlayer(MyNetworkPlayer player)
     {
         foreach (MyNetworkPlayer p in networkPlayers)
-            p.UpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
+            p.TargetUpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
     }
     #endregion
 }
