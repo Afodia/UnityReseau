@@ -275,9 +275,11 @@ public class GameManager : NetworkBehaviour
         if (card.type == CardsData.Type.Add) {
             currPlayer.ChangeMoney(card.value);
             ChangeMoneyDisplayed();
+            TileActionEnded();
         } else if (card.type == CardsData.Type.Remove) {
             currPlayer.ChangeMoney(-card.value);
             ChangeMoneyDisplayed();
+            TileActionEnded();
         } else {
             if (currPlayer.GetTile() > card.value && card.value != 24) {
                 currPlayer.ChangeMoney(300000);
@@ -286,10 +288,7 @@ public class GameManager : NetworkBehaviour
             currPlayer.SetTile((int)card.value);
             currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition((int)card.value, currPlayer.GetPlayerId()));
             Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
-            return;
         }
-
-        TileActionEnded();
     }
 
     [Server]

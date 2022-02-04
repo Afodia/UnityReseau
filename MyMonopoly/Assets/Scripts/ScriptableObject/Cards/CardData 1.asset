@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 1
   m_EditorClassIdentifier: 
   type: 2
-  description: Go to Seville
+  description: Go to Seville.
   value: 2

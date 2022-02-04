@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 6
   m_EditorClassIdentifier: 
   type: 1
-  description: Pay 15 000 for your child teaching fees
+  description: Pay $ 15 000 for your child teaching fees.
   value: 15000

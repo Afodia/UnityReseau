@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 9
   m_EditorClassIdentifier: 
   type: 1
-  description: You destroyed your neighbor car, pay 10 000
+  description: You destroyed your neighbor car. Pay $ 10 000.
   value: 10000
