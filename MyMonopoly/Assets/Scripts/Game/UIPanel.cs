@@ -63,7 +63,7 @@ public class UIPanel : NetworkBehaviour
         float alreadyBought = 0;
 
         for (int i = 0 ; i <= lvl ; i++)
-            alreadyBought += currData.upgradePrice[i];
+            alreadyBought += data.upgradePrice[i];
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
         Debug.Log("lvl in show upgrade panel : " + lvl);
