@@ -59,8 +59,10 @@ public class BuyableTile : Tile
         for (int i = 0 ; i < 4 ; i++)
             toSend[i] = player.GetPlayerId() - 1 + (i * 4);
 
-        if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
+        if (player.GetMoney() >= data.upgradePrice[currLvl + 1]) {
+            Debug.Log("tile to upgrade / buy is lvl : " + currLvl);
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
+        }
         else
             GameManager.instance.TileActionEnded();
     }

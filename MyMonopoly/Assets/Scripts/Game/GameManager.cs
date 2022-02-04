@@ -174,10 +174,10 @@ public class GameManager : NetworkBehaviour
         int newPos = currPlayer.GetTile() + diceResult;
         if (newPos >= Tiles.Length) {
             Tiles[0].GetComponent<Tile>().Action(currPlayer, 0);
-            ChangeMoneyDisplayed();
             newPos %= (Tiles.Length - 1);
             newPos -= 1;
         }
+        ChangeMoneyDisplayed();
         currPlayer.SetTile(newPos);
         currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos, currPlayer.GetPlayerId()));
 
@@ -457,6 +457,7 @@ public class GameManager : NetworkBehaviour
         }
 
         ChangeMoneyDisplayed();
+        Debug.Log("CmdSellTiles end");
         TileActionEnded();
     }
 
