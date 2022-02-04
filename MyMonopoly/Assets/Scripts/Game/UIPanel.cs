@@ -66,12 +66,16 @@ public class UIPanel : NetworkBehaviour
             alreadyBought += currData.upgradePrice[i];
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
+        Debug.Log("already bought: " + alreadyBought);
+        Debug.Log("player money : " + money);
         Debug.Log("lvl in show upgrade panel : " + lvl);
         for (int i = 0 ; i < upgradePanels.Length ; i++) {
             upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[housesId[i]];
             upgradePanels[i].GetComponentInChildren<TMP_Text>().text = GameManager.instance.ChangePriceToText(data.upgradePrice[i]);
             toBuy += data.upgradePrice[i];
+            Debug.Log($"{toBuy} for upgrade lvl {i}");
             if (i <= lvl || (toBuy - alreadyBought) > money) {
+                Debug.Log($"(toBuy - alreadyBought) > money ? {(toBuy - alreadyBought) > money}");
                 Debug.Log("disable panel nb " + i);
                 upgradePanels[i].GetComponent<Button>().enabled = false;
                 if (lvl != -1 && i <= lvl) {

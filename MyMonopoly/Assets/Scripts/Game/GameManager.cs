@@ -112,6 +112,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnLaunchDicePhase()
     {
+        ChangeMoneyDisplayed();
         currPlayer.TargetShowDiceButton();
     }
 
@@ -499,6 +500,7 @@ public class GameManager : NetworkBehaviour
         foreach (MyNetworkPlayer p in networkPlayers) {
             p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
         }
+        return;
     }
 
     #endregion
