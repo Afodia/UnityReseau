@@ -67,7 +67,6 @@ public class UIPanel : NetworkBehaviour
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
         ResetBuyUi();
-        upgradePanel.SetActive(true);
         Debug.Log("already bought: " + alreadyBought);
         Debug.Log("player money : " + money);
         Debug.Log("lvl in show upgrade panel : " + lvl);
@@ -115,13 +114,13 @@ public class UIPanel : NetworkBehaviour
             up.transform.Find("Selection").gameObject.SetActive(false);
             up.GetComponent<Button>().enabled = true;
         }
-        upgradePanel.SetActive(false);
     }
 
     [Client]
     public void ValidateUpgrade()
     {
         ResetBuyUi();
+        upgradePanel.SetActive(false);
         GameManager.instance.CmdUpgradeBuilding(upgradeLevel);
     }
 
@@ -129,6 +128,7 @@ public class UIPanel : NetworkBehaviour
     public void CancelBuy()
     {
         ResetBuyUi();
+        upgradePanel.SetActive(false);
         GameManager.instance.TileActionEnded();
     }
     #endregion
