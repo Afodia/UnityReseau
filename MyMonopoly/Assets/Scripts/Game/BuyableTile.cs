@@ -94,7 +94,13 @@ public class BuyableTile : Tile
         float rent = GetRent();
 
         player.ChangeMoney(-rent);
-        GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);
+        GameManager.instance.ChangeMoneyDisplayedOfPlayer(player);
+
+        MyNetworkPlayer owner = GameManager.instance.GetPlayer(ownerId);
+        if (owner) {
+            owner.ChangeMoney(rent);
+            GameManager.instance.ChangeMoneyDisplayedOfPlayer(owner);
+        }
 
         GameManager.instance.TileActionEnded();
     }

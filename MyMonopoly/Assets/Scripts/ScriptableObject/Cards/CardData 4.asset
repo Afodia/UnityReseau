@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 4
   m_EditorClassIdentifier: 
   type: 2
-  description: Go to Jail
+  description: Go to Jail.
   value: 24

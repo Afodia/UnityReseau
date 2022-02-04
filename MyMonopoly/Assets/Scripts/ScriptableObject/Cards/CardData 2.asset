@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 2
   m_EditorClassIdentifier: 
   type: 1
-  description: You eat at an incredible restaurant. Pay 20 000
+  description: You eat at an incredible restaurant. Pay $ 20 000.
   value: 20000

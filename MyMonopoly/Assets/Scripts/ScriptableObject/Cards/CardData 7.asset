@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: CardData 7
   m_EditorClassIdentifier: 
   type: 0
-  description: Happy new year ! You received 5 000
+  description: Happy new year ! You received $ 5 000.
   value: 5000
