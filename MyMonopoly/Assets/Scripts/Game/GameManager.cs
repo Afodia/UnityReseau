@@ -231,10 +231,20 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnNextTurnPhase()
     {
-        int nextPlayerId = currPlayer.GetPlayerId() + 1;
-        if (nextPlayerId > networkPlayers.Count)
-            nextPlayerId = 1;
-        currPlayer = networkPlayers[nextPlayerId - 1];
+        MyNetworkPlayer p = currPlayer;
+        bool isCurrentPlayer = false;
+        foreach (MyNetworkPlayer player in networkPlayers) {
+            if (isCurrentPlayer) {
+                currPlayer = player;
+                break;
+            }
+            if (player.GetPlayerId() == currPlayer.GetPlayerId()) {
+                isCurrentPlayer = true;
+            }
+        }
+        if (p.GetPlayerId() == currPlayer.GetPlayerId())
+            currPlayer = networkPlayers[0];
+
         nbDouble = 0;
         currPhase = Phase.LaunchDice;
         PhaseChange();
@@ -338,6 +348,7 @@ public class GameManager : NetworkBehaviour
     public void OnPlayerLose()
     {
         currPlayer.RpcDisablePlayerAvatar();
+        networkPlayers.Remove(currPlayer);
         playAgain = false;
         // TileActionEnded();
     }
