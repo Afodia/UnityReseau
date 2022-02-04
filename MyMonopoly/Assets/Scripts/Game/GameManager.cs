@@ -112,7 +112,6 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnLaunchDicePhase()
     {
-        ChangeMoneyDisplayed();
         currPlayer.TargetShowDiceButton();
     }
 
@@ -457,7 +456,6 @@ public class GameManager : NetworkBehaviour
         }
 
         ChangeMoneyDisplayed();
-        Debug.Log("CmdSellTiles end");
         TileActionEnded();
     }
 
@@ -505,10 +503,6 @@ public class GameManager : NetworkBehaviour
     {
         foreach (MyNetworkPlayer p in networkPlayers)
             p.UpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
-        }
-        return;
     }
-
     #endregion
-
 }
