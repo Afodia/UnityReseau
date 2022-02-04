@@ -34,6 +34,8 @@ public class MyNetworkPlayer : NetworkBehaviour
     public bool isReady = false;
     public bool launchingDice = true;
 
+    public bool mustSell = false;
+
     #region Server
 
     void Start()
@@ -60,8 +62,10 @@ public class MyNetworkPlayer : NetworkBehaviour
             $"Your cities sell value was $ {ownedTilesSellValue}\n" +
             $"And you owed $ {needToBePaid}");
             GameManager.instance.OnPlayerLose();
-        } else
+        } else {
+            this.mustSell = true;
             GetComponent<UIPanel>().TargetShowSellPanel(GameManager.instance.GetPlayerOwnedTiles(this.playerId), needToBePaid);
+        }
     }
 
     #endregion

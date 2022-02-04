@@ -102,7 +102,8 @@ public class BuyableTile : Tile
             GameManager.instance.ChangeMoneyDisplayedOfPlayer(owner);
         }
 
-        GameManager.instance.TileActionEnded();
+        if (!player.mustSell)
+            GameManager.instance.TileActionEnded();
     }
 
     [Server]

@@ -66,6 +66,8 @@ public class UIPanel : NetworkBehaviour
             alreadyBought += data.upgradePrice[i];
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
+        ResetBuyUi();
+        upgradePanel.SetActive(true);
         Debug.Log("already bought: " + alreadyBought);
         Debug.Log("player money : " + money);
         Debug.Log("lvl in show upgrade panel : " + lvl);

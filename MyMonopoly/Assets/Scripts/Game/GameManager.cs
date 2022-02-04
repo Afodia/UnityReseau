@@ -332,7 +332,7 @@ public class GameManager : NetworkBehaviour
     {
         currPlayer.DisablePlayerAvatar();
         playAgain = false;
-        TileActionEnded();
+        // TileActionEnded();
     }
 
     [Server]
@@ -455,6 +455,7 @@ public class GameManager : NetworkBehaviour
             }
         }
 
+        currPlayer.mustSell = false;
         ChangeMoneyDisplayed();
         TileActionEnded();
     }
