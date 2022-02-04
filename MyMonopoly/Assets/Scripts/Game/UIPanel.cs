@@ -61,24 +61,23 @@ public class UIPanel : NetworkBehaviour
     {
         float toBuy = 0;
         float alreadyBought = 0;
+
         for (int i = 0 ; i <= lvl ; i++)
             alreadyBought += currData.upgradePrice[i];
-        Debug.Log($"Tile lvl : {lvl}, player money : {money}");
-        Debug.Log($"Already bought {alreadyBought}");
         upgradeLevel = lvl;
         upgradePanel.SetActive(true);
+
         for (int i = 0 ; i < upgradePanels.Length ; i++) {
             upgradePanels[i].GetComponentsInChildren<Image>()[1].sprite = houses[housesId[i]];
             upgradePanels[i].GetComponentInChildren<TMP_Text>().text = GameManager.instance.ChangePriceToText(data.upgradePrice[i]);
             toBuy += data.upgradePrice[i];
-            Debug.Log($"toBuy {toBuy} for i {i}");
             if (i <= lvl || (toBuy - alreadyBought) > money) {
-                Debug.Log($"Disable button nb : ${i + 1}");
                 upgradePanels[i].GetComponent<Button>().enabled = false;
                 if (lvl != -1 && i <= lvl)
                     upgradePanels[i].transform.Find("Selection").gameObject.SetActive(true); 
             }
         }
+
         currLvl = lvl;
         currData = data;
         upgradeCity.text = data.tileName;
@@ -88,7 +87,6 @@ public class UIPanel : NetworkBehaviour
     [Client]
     void UpgradeUpdate()
     {
-        Debug.Log("upgrade panel, new lvl :" + upgradeLevel);
         float toBuy = 0;
         for (int i = currLvl + 1 ; i <= upgradeLevel ; i++)
             toBuy += currData.upgradePrice[i];

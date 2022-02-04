@@ -15,7 +15,7 @@ public class MonopoliesLine
 
         int ownerId = this.monopolies[0].tiles[0].GetOwnerId();
         foreach (Monopoly monopoly in this.monopolies)
-            if (!monopoly.IsMonopoly() || monopoly.GetMonopolyOwnerId() != ownerId)
+            if (!monopoly.IsMonopoly(true) || monopoly.GetMonopolyOwnerId() != ownerId)
                 return false;
 
         return true;

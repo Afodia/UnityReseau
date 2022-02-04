@@ -188,7 +188,7 @@ public class MyNetworkPlayer : NetworkBehaviour
        if (playerId != this.playerId) {
            WinLoseText.text = $"Player {playerId} won because you {reason}, so... you lost";
        } else
-           WinLoseText.text = $"You won because {reason}";
+           WinLoseText.text = $"You won because you {reason}";
     }
 
     [TargetRpc]

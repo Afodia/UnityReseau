@@ -27,7 +27,7 @@ public class BuyableTile : Tile
     {
         if (ownerId == 0 && type == Type.Beach)
             BuyBeachTile(player);
-        else if ((ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
+        else if (type != Type.Beach && (ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
             UpgradeTile(player);
         else if (player.GetPlayerId() != ownerId)
             PayRent(player);
@@ -47,10 +47,8 @@ public class BuyableTile : Tile
     {
         if (player.GetMoney() >= data.upgradePrice[0])
             player.RpcDisplayBuyBeachOffer(data);
-        else {
-            Debug.Log("couldn't buy");
+        else
             GameManager.instance.TileActionEnded();
-        }
     }
 
     [Server]
@@ -63,10 +61,8 @@ public class BuyableTile : Tile
 
         if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
-        else {
-            Debug.Log("couldn't buy");
+        else
             GameManager.instance.TileActionEnded();
-        }
     }
 
     [Server]
@@ -80,7 +76,6 @@ public class BuyableTile : Tile
     [ClientRpc]
     void RpcUpdateUI(int pId, int lvl)
     {
-        Debug.Log("lvl : " + lvl);
         if (pId == 0) {
             price.text = "";
             house.sprite = null;

@@ -38,9 +38,6 @@ public class GameManager : NetworkBehaviour
     bool playAgain = false;
     int diceResult = 0;
 
-    bool previousActionFinished = true;
-
-
     #region Server
 
     [Server]
@@ -160,8 +157,6 @@ public class GameManager : NetworkBehaviour
         currPlayer.RpcHideDices();
 
         if (nbDouble >= 3) {
-            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
-            this.previousActionFinished = false;
             Tiles[24].GetComponent<Tile>().Action(currPlayer, 8);
             playAgain = false;
             currPhase = Phase.NextTurn;
@@ -177,13 +172,11 @@ public class GameManager : NetworkBehaviour
     void OnMovePhase()
     {
         int newPos = currPlayer.GetTile() + diceResult;
-        Debug.Log($"Dice result : {diceResult}");
-        if (newPos > Tiles.Length - 1) {
-            Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
-            this.previousActionFinished = false;
+        if (newPos >= Tiles.Length) {
             Tiles[0].GetComponent<Tile>().Action(currPlayer, 0);
             ChangeMoneyDisplayed();
             newPos %= (Tiles.Length - 1);
+            newPos -= 1;
         }
         currPlayer.SetTile(newPos);
         currPlayer.RpcSetPlayerAvatarPosition(this.GetTilePosition(newPos, currPlayer.GetPlayerId()));
@@ -195,18 +188,12 @@ public class GameManager : NetworkBehaviour
     [Server]
     void OnTileActionPhase()
     {
-        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to false");
-        this.previousActionFinished = false;
-
         Tiles[currPlayer.GetTile()].GetComponent<Tile>().Action(currPlayer, 8);
     }
 
     [Server]
     public void TileActionEnded()
     {
-        Debug.Log("TileActionEnded");
-        Debug.Log($"previousActionFinished: {this.previousActionFinished} and set to true");
-        this.previousActionFinished = true;
         if (currPlayer.isInJail())
             currPhase = Phase.NextTurn;
         else
@@ -221,10 +208,10 @@ public class GameManager : NetworkBehaviour
         CheckAndUpdateBeachesTiles();
         CheckAndUpdateMonopoliesStates();
 
-        // if (NetworkServer.connections.Count <= 1) {
-        //   currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "are the last player connected !");
-        //   return;
-        // }
+        if (NetworkServer.connections.Count <= 1) {
+          currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "are the last player connected !");
+          return;
+        }
 
         if (MonopoliesLines[0].monopolies[0].IsMonopoly() && MonopoliesLines[0].monopolies[0].GetMonopolyOwnerId() == currPlayer.GetPlayerId()) {
             currPlayer.RpcPlayerWin(currPlayer.GetPlayerId(), "own all the beaches !");
@@ -370,8 +357,8 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void CheckAndUpdateMonopoliesStates()
     {
-        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
-            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+        for (int i = 1; i < MonopoliesLines.Count; i++)
+            foreach (Monopoly monopoly in MonopoliesLines[i].monopolies)
                 SetTilesMonopolyState(monopoly, monopoly.IsMonopoly());
     }
 
@@ -388,8 +375,8 @@ public class GameManager : NetworkBehaviour
     {
         int nbMonopolies = 0;
 
-        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
-            foreach (Monopoly monopoly in monopoliesLine.monopolies)
+        for (int i = 1; i < MonopoliesLines.Count; i++)
+            foreach (Monopoly monopoly in MonopoliesLines[i].monopolies)
                 if (monopoly.IsMonopoly() && monopoly.GetMonopolyOwnerId() == playerId)
                     nbMonopolies++;
 
@@ -399,8 +386,8 @@ public class GameManager : NetworkBehaviour
     [Server]
     bool PlayerHasMonopolyLine(int playerId)
     {
-        foreach (MonopoliesLine monopoliesLine in MonopoliesLines)
-            if (monopoliesLine.IsLinearMonopoly() && monopoliesLine.GetMonopoliesLineOwnerId() == playerId)
+        for (int i = 1; i < MonopoliesLines.Count; i++)
+            if (MonopoliesLines[i].IsLinearMonopoly() && MonopoliesLines[i].GetMonopoliesLineOwnerId() == playerId)
                 return true;
 
         return false;

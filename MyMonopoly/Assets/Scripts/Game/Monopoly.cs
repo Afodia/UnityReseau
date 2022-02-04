@@ -8,9 +8,9 @@ public class Monopoly
 {
     public List<BuyableTile> tiles;
 
-    public bool IsMonopoly()
+    public bool IsMonopoly(bool checkMonopolyLine = false)
     {
-        if (this.tiles.Count >= 1)
+        if ((checkMonopolyLine && this.tiles.Count == 0) || (!checkMonopolyLine && this.tiles.Count <= 1))
             return false;
 
         int ownerId = tiles[0].GetOwnerId();
