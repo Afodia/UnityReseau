@@ -496,9 +496,15 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void ChangeMoneyDisplayed()
     {
-        foreach (MyNetworkPlayer p in networkPlayers) {
+        foreach (MyNetworkPlayer p in networkPlayers)
             p.UpdateDisplayMoneyOfPlayer(currPlayer.GetPlayerId(), currPlayer.GetMoney());
-        }
+    }
+
+    [Server]
+    public void ChangeMoneyDisplayedOfPlayer(MyNetworkPlayer player)
+    {
+        foreach (MyNetworkPlayer p in networkPlayers)
+            p.UpdateDisplayMoneyOfPlayer(player.GetPlayerId(), player.GetMoney());
     }
 
     #endregion
