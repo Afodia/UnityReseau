@@ -194,16 +194,6 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void TileActionEnded()
     {
-        if (currPlayer.isInJail())
-            currPhase = Phase.NextTurn;
-        else
-            currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
-        PhaseChange();
-    }
-
-    [Server]
-    void OnNextTurnPhase()
-    {
         ChangeMoneyDisplayed();
         CheckAndUpdateBeachesTiles();
         CheckAndUpdateMonopoliesStates();
@@ -224,6 +214,16 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
+        if (currPlayer.isInJail())
+            currPhase = Phase.NextTurn;
+        else
+            currPhase = playAgain ? Phase.LaunchDice : Phase.NextTurn;
+        PhaseChange();
+    }
+
+    [Server]
+    void OnNextTurnPhase()
+    {
         int nextPlayerId = currPlayer.GetPlayerId() + 1;
         if (nextPlayerId > networkPlayers.Count)
             nextPlayerId = 1;
@@ -492,7 +492,7 @@ public class GameManager : NetworkBehaviour
         return toReturn;
     }
 
-        [Server]
+    [Server]
     public void ChangeMoneyDisplayed()
     {
         foreach (MyNetworkPlayer p in networkPlayers) {

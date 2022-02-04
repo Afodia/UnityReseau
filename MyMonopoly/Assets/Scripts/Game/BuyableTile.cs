@@ -93,7 +93,6 @@ public class BuyableTile : Tile
         player.ChangeMoney(-rent);
         GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);
 
-        GameManager.instance.ChangeMoneyDisplayed();
         GameManager.instance.TileActionEnded();
     }
 
