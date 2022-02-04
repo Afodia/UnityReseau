@@ -109,11 +109,11 @@ public class UIPanel : NetworkBehaviour
     [Client]
     private void ResetBuyUi()
     {
-        upgradePanel.SetActive(false);
         foreach (GameObject up in upgradePanels) {
             up.transform.Find("Selection").gameObject.SetActive(false);
             up.GetComponent<Button>().enabled = true;
         }
+        upgradePanel.SetActive(false);
     }
 
     [Client]
