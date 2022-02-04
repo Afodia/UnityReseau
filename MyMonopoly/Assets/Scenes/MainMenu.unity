@@ -2861,7 +2861,7 @@ MonoBehaviour:
   playerSpawnMethod: 1
   spawnPrefabs: []
   showRoomGUI: 1
-  minPlayers: 1
+  minPlayers: 2
   roomPlayerPrefab: {fileID: -3565350568526003090, guid: 23f8ad7daec59b94987c4c8ed5e13050, type: 3}
   RoomScene: Assets/Scenes/RoomMenu.unity
   GameplayScene: Assets/Scenes/Game.unity

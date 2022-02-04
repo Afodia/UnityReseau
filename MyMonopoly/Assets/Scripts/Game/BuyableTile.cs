@@ -25,34 +25,34 @@ public class BuyableTile : Tile
 
     public override void Action(MyNetworkPlayer player, int tileId)
     {
-        if (type == Type.Beach)
-            BeachTile();
-        else {
-            if ((ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
-                UpgradeTile(player);
-            else if (player.GetPlayerId() != ownerId)
-                PayRent(player);
-            else
-                GameManager.instance.TileActionEnded();
-        }
+        if (ownerId == 0 && type == Type.Beach)
+            BuyBeachTile(player);
+        else if (type != Type.Beach && (ownerId == 0 || ownerId == player.GetPlayerId()) && currLvl < 3)
+            UpgradeTile(player);
+        else if (player.GetPlayerId() != ownerId)
+            PayRent(player);
+        else
+            GameManager.instance.TileActionEnded();
     }
 
     [Server]
-    private void BeachTile()
-    {
-        Debug.Log("Beach tile");
-        GameManager.instance.TileActionEnded();
-    }
-
-    [Server]
-    private void BuyTile(MyNetworkPlayer player) // Pupose is to buy tile of another player
+    void BuyTile(MyNetworkPlayer player) // Pupose is to buy tile of another player
     {
         if (ownerId != 0)
             return;
     }
 
     [Server]
-    private void UpgradeTile(MyNetworkPlayer player)
+    void BuyBeachTile(MyNetworkPlayer player)
+    {
+        if (player.GetMoney() >= data.upgradePrice[0])
+            player.RpcDisplayBuyBeachOffer(data);
+        else
+            GameManager.instance.TileActionEnded();
+    }
+
+    [Server]
+    void UpgradeTile(MyNetworkPlayer player)
     {
         int[] toSend = new int[4];
 
@@ -61,10 +61,8 @@ public class BuyableTile : Tile
 
         if (player.GetMoney() >= data.upgradePrice[currLvl + 1])
             player.RpcDisplayUpgradeOffer(data, toSend, currLvl);
-        else {
-            Debug.Log("couldn't buy");
+        else
             GameManager.instance.TileActionEnded();
-        }
     }
 
     [Server]
@@ -76,9 +74,8 @@ public class BuyableTile : Tile
     }
 
     [ClientRpc]
-    private void RpcUpdateUI(int pId, int lvl)
+    void RpcUpdateUI(int pId, int lvl)
     {
-        Debug.Log("lvl : " + lvl);
         if (pId == 0) {
             price.text = "";
             house.sprite = null;
@@ -89,14 +86,13 @@ public class BuyableTile : Tile
     }
 
     [Server]
-    private void PayRent(MyNetworkPlayer player)
+    void PayRent(MyNetworkPlayer player)
     {
         float rent = GetRent();
 
         player.ChangeMoney(-rent);
         GameManager.instance.GetPlayer(ownerId).ChangeMoney(rent);
 
-        GameManager.instance.ChangeMoneyDisplayed();
         GameManager.instance.TileActionEnded();
     }
 
@@ -113,7 +109,7 @@ public class BuyableTile : Tile
     }
 
     [Server]
-    private float GetRent()
+    float GetRent()
     {
         return data.rentPrice[currLvl] * (System.Convert.ToSingle(isMonopoly) + 1f);
     }
